@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Management - Queueless Admin</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Same sidebar as other pages -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="main-header">
+            <div class="header-left">
+                <h1><i class="fas fa-table"></i> Table Management</h1>
+                <p>Manage restaurant tables and seating arrangements</p>
+            </div>
+            <div class="header-right">
+                <div class="table-actions">
+                    <button class="btn-primary" onclick="openAddTableModal()">
+                        <i class="fas fa-plus"></i> Add Table
+                    </button>
+                    <button class="btn-secondary" onclick="printQRcodes()">
+                        <i class="fas fa-qrcode"></i> Print QR Codes
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Table Status Summary -->
+        <div class="table-summary">
+            <div class="summary-card">
+                <div class="summary-icon available">
+                    <i class="fas fa-chair"></i>
+                </div>
+                <div class="summary-info">
+                    <h3 id="availableTables">15</h3>
+                    <p>Available</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-icon occupied">
+                    <i class="fas fa-chair"></i>
+                </div>
+                <div class="summary-info">
+                    <h3 id="occupiedTables">8</h3>
+                    <p>Occupied</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-icon reserved">
+                    <i class="fas fa-chair"></i>
+                </div>
+                <div class="summary-info">
+                    <h3 id="reservedTables">2</h3>
+                    <p>Reserved</p>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-icon maintenance">
+                    <i class="fas fa-chair"></i>
+                </div>
+                <div class="summary-info">
+                    <h3 id="maintenanceTables">1</h3>
+                    <p>Maintenance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Layout -->
+        <div class="table-layout-container">
+            <div class="layout-header">
+                <h3><i class="fas fa-map"></i> Table Layout</h3>
+                <div class="layout-controls">
+                    <button class="layout-btn" onclick="changeLayout('grid')">
+                        <i class="fas fa-th-large"></i> Grid
+                    </button>
+                    <button class="layout-btn active" onclick="changeLayout('floor')">
+                        <i class="fas fa-map"></i> Floor Plan
+                    </button>
+                    <button class="layout-btn" onclick="changeLayout('list')">
+                        <i class="fas fa-list"></i> List
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-layout" id="tableLayout">
+                <!-- Tables will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Tables List View -->
+        <div class="tables-list-view" id="tablesListView" style="display: none;">
+            <div class="list-header">
+                <h3><i class="fas fa-list"></i> All Tables</h3>
+                <div class="list-filters">
+                    <select id="tableFilter" onchange="filterTables()">
+                        <option value="all">All Tables</option>
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="reserved">Reserved</option>
+                        <option value="maintenance">Maintenance</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="tables-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Table No</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th>Current Order</th>
+                            <th>Location</th>
+                            <th>QR Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablesTableBody">
+                        <!-- Tables list will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add/Edit Table Modal -->
+        <div id="tableModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="tableModalTitle">Add New Table</h2>
+                    <span class="close" onclick="closeTableModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="tableForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tableNumber">Table Number *</label>
+                                <input type="number" id="tableNumber" min="1" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tableCapacity">Capacity *</label>
+                                <select id="tableCapacity" required>
+                                    <option value="2">2 Persons</option>
+                                    <option value="4">4 Persons</option>
+                                    <option value="6">6 Persons</option>
+                                    <option value="8">8 Persons</option>
+                                    <option value="10">10+ Persons</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tableType">Table Type</label>
+                                <select id="tableType">
+                                    <option value="standard">Standard</option>
+                                    <option value="booth">Booth</option>
+                                    <option value="bar">Bar Counter</option>
+                                    <option value="outdoor">Outdoor</option>
+                                    <option value="private">Private Dining</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tableLocation">Location</label>
+                                <select id="tableLocation">
+                                    <option value="indoor">Indoor</option>
+                                    <option value="outdoor">Outdoor</option>
+                                    <option value="terrace">Terrace</option>
+                                    <option value="smoking">Smoking Zone</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tableStatus">Status</label>
+                            <select id="tableStatus">
+                                <option value="available">Available</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="reserved">Reserved</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tableDescription">Description (Optional)</label>
+                            <textarea id="tableDescription" rows="2" placeholder="Window view, corner table, etc."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>QR Code Settings</label>
+                            <div class="qr-settings">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="generateQR" checked>
+                                    Generate QR Code
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="printLabel">
+                                    Print Table Label
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeTableModal()">Cancel</button>
+                    <button class="btn-primary" onclick="saveTable()">Save Table</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        // Table Management
+        let tables = [];
+        let editingTableId = null;
+        let currentLayout = 'floor';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTables();
+            renderTableLayout();
+        });
+
+        function loadTables() {
+            // Load sample tables data
+            tables = JSON.parse(localStorage.getItem('queueless_tables') || '[]');
+            
+            if (tables.length === 0) {
+                tables = getSampleTables();
+                localStorage.setItem('queueless_tables', JSON.stringify(tables));
+            }
+            
+            updateTableSummary();
+            renderTablesList();
+        }
+
+        function getSampleTables() {
+            return [
+                { id: 1, number: 1, capacity: 4, type: "standard", location: "indoor", status: "occupied", description: "Window view", qrCode: "QR001", currentOrder: "#1001" },
+                { id: 2, number: 2, capacity: 6, type: "booth", location: "indoor", status: "occupied", description: "Family booth", qrCode: "QR002", currentOrder: "#1002" },
+                { id: 3, number: 3, capacity: 2, type: "standard", location: "outdoor", status: "available", description: "Romantic table", qrCode: "QR003", currentOrder: null },
+                { id: 4, number: 4, capacity: 4, type: "standard", location: "indoor", status: "occupied", description: "", qrCode: "QR004", currentOrder: "#1003" },
+                { id: 5, number: 5, capacity: 8, type: "private", location: "indoor", status: "reserved", description: "Private dining", qrCode: "QR005", currentOrder: null },
+                { id: 6, number: 6, capacity: 4, type: "bar", location: "indoor", status: "available", description: "Bar counter", qrCode: "QR006", currentOrder: null },
+                { id: 7, number: 7, capacity: 2, type: "standard", location: "outdoor", status: "available", description: "", qrCode: "QR007", currentOrder: null },
+                { id: 8, number: 8, capacity: 6, type: "booth", location: "indoor", status: "occupied", description: "Center table", qrCode: "QR008", currentOrder: "#1004" },
+                { id: 9, number: 9, capacity: 4, type: "standard", location: "indoor", status: "available", description: "", qrCode: "QR009", currentOrder: null },
+                { id: 10, number: 10, capacity: 10, type: "private", location: "terrace", status: "reserved", description: "Large group", qrCode: "QR010", currentOrder: null },
+                { id: 11, number: 11, capacity: 2, type: "standard", location: "indoor", status: "maintenance", description: "Under repair", qrCode: "QR011", currentOrder: null },
+                { id: 12, number: 12, capacity: 4, type: "standard", location: "outdoor", status: "occupied", description: "Garden view", qrCode: "QR012", currentOrder: "#1005" }
+            ];
+        }
+
+        function updateTableSummary() {
+            const available = tables.filter(t => t.status === 'available').length;
+            const occupied = tables.filter(t => t.status === 'occupied').length;
+            const reserved = tables.filter(t => t.status === 'reserved').length;
+            const maintenance = tables.filter(t => t.status === 'maintenance').length;
+            
+            document.getElementById('availableTables').textContent = available;
+            document.getElementById('occupiedTables').textContent = occupied;
+            document.getElementById('reservedTables').textContent = reserved;
+            document.getElementById('maintenanceTables').textContent = maintenance;
+        }
+
+        function renderTableLayout() {
+            const container = document.getElementById('tableLayout');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Create floor plan visualization
+            const floorPlan = document.createElement('div');
+            floorPlan.className = 'floor-plan';
+            
+            // Create different sections
+            const sections = [
+                { name: 'Indoor Dining', tables: tables.filter(t => t.location === 'indoor' && t.type !== 'bar') },
+                { name: 'Bar Area', tables: tables.filter(t => t.type === 'bar') },
+                { name: 'Outdoor', tables: tables.filter(t => t.location === 'outdoor') },
+                { name: 'Terrace', tables: tables.filter(t => t.location === 'terrace') }
+            ];
+            
+            sections.forEach(section => {
+                if (section.tables.length > 0) {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'floor-section';
+                    sectionDiv.innerHTML = `<h4>${section.name}</h4>`;
+                    
+                    const tablesGrid = document.createElement('div');
+                    tablesGrid.className = 'tables-grid';
+                    
+                    section.tables.forEach(table => {
+                        const tableDiv = document.createElement('div');
+                        tableDiv.className = `table-item status-${table.status}`;
+                        tableDiv.innerHTML = `
+                            <div class="table-number">${table.number}</div>
+                            <div class="table-info">
+                                <span class="capacity">${table.capacity} <i class="fas fa-user"></i></span>
+                                ${table.currentOrder ? `<span class="order-badge">#${table.currentOrder}</span>` : ''}
+                            </div>
+                            <div class="table-actions-small">
+                                <button onclick="viewTable(${table.id})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        `;
+                        tablesGrid.appendChild(tableDiv);
+                    });
+                    
+                    sectionDiv.appendChild(tablesGrid);
+                    floorPlan.appendChild(sectionDiv);
+                }
+            });
+            
+            container.appendChild(floorPlan);
+        }
+
+        function renderTablesList() {
+            const tableBody = document.getElementById('tablesTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            tables.forEach(table => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>Table ${table.number}</strong></td>
+                    <td>${table.capacity} Persons</td>
+                    <td>
+                        <span class="status-badge status-${table.status}">
+                            ${table.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>
+                        ${table.currentOrder ? 
+                            `<a href="#" onclick="viewOrder('${table.currentOrder}')">${table.currentOrder}</a>` : 
+                            'No Order'}
+                    </td>
+                    <td>${table.location}</td>
+                    <td>
+                        <button class="btn-qr" onclick="viewQRCode(${table.id})">
+                            <i class="fas fa-qrcode"></i> View QR
+                        </button>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn-view" onclick="viewTable(${table.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-edit" onclick="editTable(${table.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteTable(${table.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function changeLayout(layout) {
+            currentLayout = layout;
+            
+            // Update button states
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const layoutContainer = document.getElementById('tableLayout');
+            const listView = document.getElementById('tablesListView');
+            
+            if (layout === 'list') {
+                layoutContainer.style.display = 'none';
+                listView.style.display = 'block';
+            } else {
+                layoutContainer.style.display = 'block';
+                listView.style.display = 'none';
+                
+                if (layout === 'grid') {
+                    renderTableGrid();
+                } else {
+                    renderTableLayout();
+                }
+            }
+        }
+
+        function renderTableGrid() {
+            const container = document.getElementById('tableLayout');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const grid = document.createElement('div');
+            grid.className = 'tables-grid-view';
+            
+            tables.forEach(table => {
+                const tableCard = document.createElement('div');
+                tableCard.className = 'table-card';
+                tableCard.innerHTML = `
+                    <div class="table-card-header status-${table.status}">
+                        <span class="table-number">Table ${table.number}</span>
+                        <span class="table-status">${table.status}</span>
+                    </div>
+                    <div class="table-card-body">
+                        <div class="table-card-info">
+                            <p><i class="fas fa-users"></i> ${table.capacity} Persons</p>
+                            <p><i class="fas fa-map-marker-alt"></i> ${table.location}</p>
+                            <p><i class="fas fa-chair"></i> ${table.type}</p>
+                        </div>
+                        ${table.currentOrder ? 
+                            `<div class="current-order">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Order: ${table.currentOrder}</span>
+                            </div>` : ''}
+                        ${table.description ? 
+                            `<div class="table-description">
+                                <i class="fas fa-info-circle"></i>
+                                <span>${table.description}</span>
+                            </div>` : ''}
+                    </div>
+                    <div class="table-card-footer">
+                        <button class="btn-action" onclick="viewTable(${table.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-action" onclick="editTable(${table.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-action" onclick="viewQRCode(${table.id})">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(tableCard);
+            });
+            
+            container.appendChild(grid);
+        }
+
+        function filterTables() {
+            const filter = document.getElementById('tableFilter').value;
+            let filtered = tables;
+            
+            if (filter !== 'all') {
+                filtered = tables.filter(table => table.status === filter);
+            }
+            
+            const tableBody = document.getElementById('tablesTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            filtered.forEach(table => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>Table ${table.number}</strong></td>
+                    <td>${table.capacity} Persons</td>
+                    <td>
+                        <span class="status-badge status-${table.status}">
+                            ${table.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>
+                        ${table.currentOrder ? 
+                            `<a href="#" onclick="viewOrder('${table.currentOrder}')">${table.currentOrder}</a>` : 
+                            'No Order'}
+                    </td>
+                    <td>${table.location}</td>
+                    <td>
+                        <button class="btn-qr" onclick="viewQRCode(${table.id})">
+                            <i class="fas fa-qrcode"></i> View QR
+                        </button>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn-view" onclick="viewTable(${table.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-edit" onclick="editTable(${table.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-delete" onclick="deleteTable(${table.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function openAddTableModal() {
+            editingTableId = null;
+            document.getElementById('tableModalTitle').textContent = 'Add New Table';
+            document.getElementById('tableForm').reset();
+            document.getElementById('tableModal').style.display = 'flex';
+        }
+
+        function viewTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+            
+            alert(`Table ${table.number} Details:\n
+                Status: ${table.status}\n
+                Capacity: ${table.capacity} persons\n
+                Type: ${table.type}\n
+                Location: ${table.location}\n
+                Description: ${table.description || 'None'}\n
+                Current Order: ${table.currentOrder || 'None'}`);
+        }
+
+        function editTable(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+            
+            editingTableId = tableId;
+            document.getElementById('tableModalTitle').textContent = 'Edit Table';
+            
+            // Fill form with table data
+            document.getElementById('tableNumber').value = table.number;
+            document.getElementById('tableCapacity').value = table.capacity;
+            document.getElementById('tableType').value = table.type;
+            document.getElementById('tableLocation').value = table.location;
+            document.getElementById('tableStatus').value = table.status;
+            document.getElementById('tableDescription').value = table.description || '';
+            
+            document.getElementById('tableModal').style.display = 'flex';
+        }
+
+        function saveTable() {
+            const form = document.getElementById('tableForm');
+            if (!form.checkValidity()) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const newTable = {
+                id: editingTableId || tables.length + 1,
+                number: parseInt(document.getElementById('tableNumber').value),
+                capacity: parseInt(document.getElementById('tableCapacity').value),
+                type: document.getElementById('tableType').value,
+                location: document.getElementById('tableLocation').value,
+                status: document.getElementById('tableStatus').value,
+                description: document.getElementById('tableDescription').value,
+                qrCode: `QR${editingTableId ? editingTableId : tables.length + 1}`,
+                currentOrder: null
+            };
+            
+            if (editingTableId) {
+                // Update existing table
+                const index = tables.findIndex(t => t.id === editingTableId);
+                if (index !== -1) {
+                    // Keep existing current order
+                    newTable.currentOrder = tables[index].currentOrder;
+                    tables[index] = newTable;
+                }
+            } else {
+                // Add new table
+                tables.push(newTable);
+            }
+            
+            localStorage.setItem('queueless_tables', JSON.stringify(tables));
+            closeTableModal();
+            
+            // Update all views
+            updateTableSummary();
+            renderTableLayout();
+            renderTablesList();
+            if (currentLayout === 'grid') {
+                renderTableGrid();
+            }
+            
+            alert(editingTableId ? 'Table updated successfully!' : 'Table added successfully!');
+        }
+
+        function deleteTable(tableId) {
+            if (confirm('Are you sure you want to delete this table?')) {
+                tables = tables.filter(t => t.id !== tableId);
+                localStorage.setItem('queueless_tables', JSON.stringify(tables));
+                
+                // Update all views
+                updateTableSummary();
+                renderTableLayout();
+                renderTablesList();
+                if (currentLayout === 'grid') {
+                    renderTableGrid();
+                }
+                
+                alert('Table deleted successfully!');
+            }
+        }
+
+        function viewQRCode(tableId) {
+            const table = tables.find(t => t.id === tableId);
+            if (!table) return;
+            
+            const qrWindow = window.open('', '_blank');
+            qrWindow.document.write(`
+                <html>
+                <head>
+                    <title>QR Code - Table ${table.number}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+                        .qr-container { margin: 20px auto; padding: 20px; border: 2px dashed #ccc; display: inline-block; }
+                        .qr-title { font-size: 24px; margin-bottom: 20px; }
+                        .qr-info { margin-top: 20px; font-size: 14px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class="qr-container">
+                        <div class="qr-title">Table ${table.number}</div>
+                        <div style="padding: 20px; background: white;">
+                            <div style="width: 200px; height: 200px; background: #f0f0f0; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666;">
+                                QR Code for Table ${table.number}<br>
+                                queueless.com/table/${table.number}
+                            </div>
+                        </div>
+                        <div class="qr-info">
+                            Scan to order from Table ${table.number}<br>
+                            Capacity: ${table.capacity} persons<br>
+                            ${table.description ? table.description + '<br>' : ''}
+                            Queueless Restaurant
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            qrWindow.document.close();
+        }
+
+        function printQRcodes() {
+            alert('Printing QR codes for all tables...');
+            // In real app, generate and print QR codes
+        }
+
+        function viewOrder(orderId) {
+            alert(`Viewing order ${orderId} - This would open order details in a real app`);
+            // In real app, redirect to order details
+        }
+
+        function closeTableModal() {
+            document.getElementById('tableModal').style.display = 'none';
+            document.getElementById('tableForm').reset();
+        }
+    </script>
+</body>
+</html>
