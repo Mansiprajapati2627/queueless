@@ -66,12 +66,6 @@
   gap: 20px;
 }
 
-@media (min-width: 1024px) {
-  .menu-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
-}
-
 .menu-item-card {
   background: white;
   border-radius: var(--border-radius-lg);
@@ -547,6 +541,8 @@
     border-radius: 0;
   }
 }
+
+/* Desktop-specific menu improvements */
 @media (min-width: 1024px) {
   .menu-grid {
     grid-template-columns: repeat(3, 1fr);
