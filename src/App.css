@@ -547,3 +547,18 @@
     border-radius: 0;
   }
 }
+@media (min-width: 1024px) {
+  .menu-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .menu-item-card {
+    transition: transform 0.3s;
+  }
+  
+  .menu-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+}

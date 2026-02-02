@@ -54,7 +54,8 @@ body {
 }
 
 /* App Container */
-.app {
+/* App Container */
+#root > .app {
   max-width: 100%;
   margin: 0 auto;
   background: white;
@@ -64,11 +65,12 @@ body {
 }
 
 @media (min-width: 769px) {
-  .app {
+  #root > .app {
     max-width: 1024px;
     margin: 20px auto;
     border-radius: var(--border-radius-xl);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    min-height: calc(100vh - 40px);
   }
 }
 
@@ -291,15 +293,23 @@ body {
 }
 
 /* Hero Section */
-.hero-section {
-  text-align: center;
-  padding: 40px 20px;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
-  margin: -20px -20px 40px;
+/* Desktop-specific hero section fix */
+@media (min-width: 769px) {
+  .hero-section {
+    margin: 0;
+    border-radius: var(--border-radius-xl);
+    margin-bottom: 40px;
+  }
+  
+  .main-content {
+    padding: 30px;
+  }
+  
+  /* Improve feature cards layout */
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
-
 .hero-icon {
   font-size: 3rem;
   margin-bottom: 20px;
@@ -560,5 +570,16 @@ body {
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+}
+@media (min-width: 769px) {
+  .hero-section {
+    margin: 0;
+    border-radius: var(--border-radius-xl);
+    margin-bottom: 40px;
+  }
+  
+  .main-content {
+    padding: 30px;
   }
 }
