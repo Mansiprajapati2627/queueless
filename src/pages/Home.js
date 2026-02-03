@@ -104,7 +104,7 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
 
       {/* Status Section */}
       {user && tableNumber && (
-        <div className="status-section">
+        <div className="status-section" style={{ width: '100%', padding: '0 20px' }}>
           <div className="card">
             <h3>Ready to Order!</h3>
             <p>You're logged in and at Table {tableNumber}</p>
@@ -140,16 +140,16 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
                 onChange={(e) => setManualTable(e.target.value)}
                 placeholder="e.g., 12"
                 className="input-group"
-                style={{ margin: '16px 0' }}
+                style={{ margin: '16px 0', width: '100%' }}
               />
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', margin: '16px 0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', margin: '16px 0', width: '100%' }}>
                 {Array.from({ length: 25 }, (_, i) => i + 1).map(num => (
                   <button
                     key={num}
                     type="button"
                     onClick={() => setManualTable(num.toString())}
                     className="btn btn-sm"
-                    style={{ padding: '8px' }}
+                    style={{ padding: '8px', width: '100%' }}
                   >
                     {num}
                   </button>

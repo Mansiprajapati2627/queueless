@@ -45,32 +45,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: var(--light);
   color: var(--dark);
+  width: 100%;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
-/* App Container */
-#root > .app {
-  max-width: 100%;
-  margin: 0 auto;
-  background: white;
+/* App Container - FULL WIDTH ALWAYS */
+.app {
+  width: 100%;
   min-height: 100vh;
+  background: white;
   position: relative;
-  box-shadow: none;
-}
-
-@media (min-width: 769px) {
-  #root > .app {
-    max-width: 1024px;
-    margin: 20px auto;
-    border-radius: var(--border-radius-xl);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    min-height: calc(100vh - 40px);
-  }
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
@@ -85,12 +78,7 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: var(--shadow-lg);
-}
-
-@media (min-width: 769px) {
-  .header {
-    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
-  }
+  width: 100%;
 }
 
 .header-logo {
@@ -156,7 +144,7 @@ body {
   font-weight: 600;
 }
 
-/* Bottom Navigation */
+/* Bottom Navigation - FIXED FULL WIDTH */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -168,21 +156,10 @@ body {
   display: flex;
   justify-content: space-around;
   z-index: 1000;
-  max-width: 768px;
-  margin: 0 auto;
+  width: 100vw !important;
+  max-width: 100vw !important;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-}
-
-@media (min-width: 769px) {
-  .bottom-nav {
-    max-width: 1024px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
-    border-top: 1px solid var(--gray-200);
-    border-left: 1px solid var(--gray-200);
-    border-right: 1px solid var(--gray-200);
-  }
+  margin: 0 !important;
 }
 
 .nav-item {
@@ -200,6 +177,8 @@ body {
   border-radius: var(--border-radius);
   min-width: 60px;
   text-decoration: none;
+  width: 100%;
+  max-width: 80px;
 }
 
 .nav-item.active {
@@ -286,21 +265,26 @@ body {
   height: 36px;
 }
 
-/* Main Content */
+/* Main Content - FIXED FOR FULL WIDTH */
 .main-content {
   flex: 1;
   padding: 20px;
-  padding-bottom: 80px;
+  padding-bottom: 100px;
+  width: 100%;
+  max-width: 100vw;
 }
 
-/* Hero Section */
+/* Hero Section - FULL WIDTH */
 .hero-section {
   text-align: center;
   padding: 40px 20px;
   background: var(--gradient-primary);
   color: white;
-  border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
-  margin: -20px -20px 40px;
+  margin: 0;
+  width: 100%;
+  position: relative;
+  left: 0;
+  right: 0;
 }
 
 .hero-icon {
@@ -328,23 +312,31 @@ body {
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
 }
 
-/* Features Section */
+/* Features Section - FULL WIDTH */
 .features-section {
   margin-bottom: 40px;
+  width: 100%;
+  max-width: 100vw;
+  padding: 0 20px;
 }
 
 .section-title {
   font-size: 1.5rem;
   margin-bottom: 24px;
   color: var(--dark);
+  width: 100%;
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .feature-card {
@@ -354,6 +346,8 @@ body {
   box-shadow: var(--shadow);
   text-align: center;
   border: 1px solid var(--gray-200);
+  width: 100%;
+  max-width: 100%;
 }
 
 .feature-icon {
@@ -369,19 +363,22 @@ body {
   font-size: 1.5rem;
 }
 
-/* Cards */
+/* Cards - FULL WIDTH */
 .card {
   background: white;
   border-radius: var(--border-radius-lg);
   padding: 20px;
   box-shadow: var(--shadow);
   border: 1px solid var(--gray-200);
+  width: 100%;
+  max-width: 100%;
 }
 
 .status-actions {
   display: flex;
   gap: 12px;
   margin-top: 20px;
+  width: 100%;
 }
 
 /* Modal */
@@ -455,6 +452,7 @@ body {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .input-group label {
@@ -474,6 +472,7 @@ body {
   font-size: 1rem;
   transition: all 0.3s;
   background: white;
+  width: 100%;
 }
 
 .input-group input:focus,
@@ -490,6 +489,7 @@ body {
   margin-bottom: 30px;
   border-bottom: 1px solid var(--gray-200);
   padding-bottom: 10px;
+  width: 100%;
 }
 
 .tab-btn {
@@ -500,6 +500,7 @@ body {
   border-radius: var(--border-radius);
   cursor: pointer;
   font-weight: 500;
+  width: 100%;
 }
 
 .tab-btn.active {
@@ -509,6 +510,7 @@ body {
 
 .tab-content {
   display: none;
+  width: 100%;
 }
 
 .tab-content.active {
@@ -549,6 +551,7 @@ body {
   
   .hero-actions {
     flex-direction: column;
+    width: 100%;
   }
   
   .features-grid {
@@ -558,27 +561,85 @@ body {
   .header-logo h1 {
     font-size: 1.25rem;
   }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  .app {
-    border-radius: 0;
-  }
-}
-
-/* Desktop-specific fixes */
-@media (min-width: 769px) {
-  .hero-section {
-    margin: 0;
-    border-radius: var(--border-radius-xl);
-    margin-bottom: 40px;
-  }
   
   .main-content {
-    padding: 30px;
+    padding: 15px;
+    padding-bottom: 100px;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 769px) {
+  .main-content {
+    padding: 30px 40px;
+    padding-bottom: 120px;
+    max-width: 100vw;
+  }
+  
+  .hero-section {
+    padding: 60px 40px;
+    margin: 0;
+  }
+  
+  .features-section {
+    padding: 0 40px;
   }
   
   .features-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
   }
+  
+  .hero-actions {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .bottom-nav {
+    padding: 15px 40px;
+  }
+  
+  .nav-item {
+    max-width: 100px;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+  .main-content {
+    padding: 40px 60px;
+    padding-bottom: 140px;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .hero-section {
+    padding: 80px 60px;
+  }
+  
+  .features-section {
+    padding: 0 60px;
+  }
+}
+
+/* Ensure all content sections use full width */
+.menu-container,
+.cart-container,
+.orders-container,
+.scanner-container,
+.search-container,
+.cart-items-section,
+.order-summary-section,
+.order-card,
+.menu-grid,
+.categories,
+.payment-methods,
+.status-section {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
 }
