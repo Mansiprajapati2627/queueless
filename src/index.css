@@ -82,7 +82,9 @@ body {
   width: 100%;
 }
 
-/* App Container - Elegant Café Style */
+/* ======== DELETE THE CONFLICTING .app STYLES BELOW ======== */
+/* REMOVE OR COMMENT OUT THIS ENTIRE SECTION: */
+/*
 .app {
   width: 100%;
   min-height: 100vh;
@@ -91,6 +93,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+*/
 
 /* Header - Sophisticated Café Header */
 .header {
@@ -640,94 +643,6 @@ body {
   }
 }
 
-/* Responsive Design */
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .hero-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .header-logo h1 {
-    font-size: 1.25rem;
-  }
-  
-  .main-content {
-    padding: 1rem;
-    padding-bottom: 100px;
-  }
-  
-  .header {
-    padding: 1rem;
-  }
-  
-  .section-title {
-    font-size: 1.5rem;
-  }
-}
-
-@media (min-width: 769px) {
-  .main-content {
-    padding: 2rem 3rem;
-    padding-bottom: 120px;
-  }
-  
-  .hero-section {
-    padding: 4rem 3rem;
-    margin: 3rem 0;
-  }
-  
-  .features-section {
-    padding: 0 2rem;
-  }
-  
-  .features-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-  }
-  
-  .hero-actions {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
-  .bottom-nav {
-    padding: 1rem 3rem;
-  }
-  
-  .nav-item {
-    max-width: 100px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .main-content {
-    padding: 3rem 4rem;
-    padding-bottom: 140px;
-  }
-  
-  .features-grid {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 100%;
-    margin: 0;
-  }
-  
-  .hero-section {
-    padding: 5rem 4rem;
-  }
-  
-  .features-section {
-    padding: 0 4rem;
-  }
-}
-
 /* Loading Spinner */
 @keyframes spin {
   0% { transform: rotate(0deg); }
@@ -751,6 +666,7 @@ body {
 .btn-secondary .loading-spinner {
   border-top-color: var(--primary);
 }
+
 /* College Canteen Homepage Styles */
 
 /* Seasonal Banner */

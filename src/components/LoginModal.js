@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -8,24 +9,52 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
     name: '',
     phone: ''
   });
+  const navigate = useNavigate();
+
+  // Admin credentials check
+  const isAdminCredentials = (email, password) => {
+    return (email === 'admin' || email === 'admin@queueless.com') && password === 'admin123';
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Check for admin credentials first
+    if (isAdminCredentials(formData.email, formData.password)) {
+      // Store admin session
+      const adminUser = {
+        name: 'Administrator',
+        email: formData.email,
+        phone: '0000000000',
+        role: 'admin'
+      };
+      
+      localStorage.setItem('queueless_admin', JSON.stringify(adminUser));
+      localStorage.setItem('queueless_user', JSON.stringify(adminUser));
+      
+      // Redirect to admin dashboard
+      window.location.href = '/admin/index.html';
+      onClose();
+      return;
+    }
+    
+    // Regular user login/signup
     if (isLogin) {
       // Demo login
       if (formData.email === 'user@example.com' && formData.password === 'password123') {
         onLogin({
           name: 'John Doe',
           email: formData.email,
-          phone: '9876543210'
+          phone: '9876543210',
+          role: 'user'
         });
       } else {
         // Any other email works for demo
         onLogin({
           name: formData.email.split('@')[0],
           email: formData.email,
-          phone: '0000000000'
+          phone: '0000000000',
+          role: 'user'
         });
       }
     } else {
@@ -33,7 +62,8 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
       onSignup({
         name: formData.name,
         email: formData.email,
-        phone: formData.phone
+        phone: formData.phone,
+        role: 'user'
       });
     }
   };
@@ -46,6 +76,9 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
   };
 
   const handleLogoutClick = () => {
+    // Clear admin session on logout
+    localStorage.removeItem('queueless_admin');
+    
     if (onLogout) {
       onLogout();
       onClose();
@@ -54,6 +87,8 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
 
   // If user is already logged in, show logout option
   if (user) {
+    const isAdmin = user.role === 'admin' || localStorage.getItem('queueless_admin');
+    
     return (
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -68,7 +103,7 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
                 width: '80px',
                 height: '80px',
                 borderRadius: '50%',
-                background: 'var(--primary)',
+                background: isAdmin ? 'var(--dark)' : 'var(--primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -76,10 +111,20 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
                 fontSize: '2rem',
                 margin: '0 auto 1rem'
               }}>
-                <i className="fas fa-user"></i>
+                {isAdmin ? <i className="fas fa-user-shield"></i> : <i className="fas fa-user"></i>}
               </div>
               <h3 style={{ marginBottom: '0.5rem', color: 'var(--charcoal)' }}>{user.name}</h3>
-              <p style={{ color: 'var(--charcoal-light)', marginBottom: '0.5rem' }}>{user.email}</p>
+              <p style={{ color: 'var(--charcoal-light)', marginBottom: '0.5rem' }}>
+                {user.email} 
+                {isAdmin && <span style={{
+                  background: 'var(--dark)',
+                  color: 'white',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  marginLeft: '0.5rem'
+                }}>ADMIN</span>}
+              </p>
               {user.phone && user.phone !== '0000000000' && (
                 <p style={{ color: 'var(--charcoal-light)' }}>
                   <i className="fas fa-phone" style={{ marginRight: '0.5rem' }}></i>
@@ -94,17 +139,31 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
               borderRadius: 'var(--border-radius)',
               marginBottom: '1.5rem'
             }}>
-              <p><strong>Demo Account:</strong> user@example.com / password123</p>
-              <p style={{ fontSize: '0.875rem', color: 'var(--charcoal-light)', marginTop: '0.5rem' }}>
-                You are currently logged in with demo credentials
-              </p>
+              {isAdmin ? (
+                <p><strong>Admin Dashboard:</strong> Click below to access admin panel</p>
+              ) : (
+                <p><strong>Demo Account:</strong> user@example.com / password123</p>
+              )}
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+              {isAdmin && (
+                <button 
+                  onClick={() => {
+                    window.location.href = '/admin/index.html';
+                    onClose();
+                  }}
+                  className="btn btn-dark"
+                  style={{ width: '100%' }}
+                >
+                  <i className="fas fa-tachometer-alt"></i> Go to Admin Dashboard
+                </button>
+              )}
+              
               <button 
                 onClick={handleLogoutClick} 
                 className="btn btn-danger"
-                style={{ flex: 1 }}
+                style={{ width: '100%' }}
               >
                 <i className="fas fa-sign-out-alt"></i> Log Out
               </button>
@@ -112,7 +171,7 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
               <button 
                 onClick={onClose}
                 className="btn btn-secondary"
-                style={{ flex: 1 }}
+                style={{ width: '100%' }}
               >
                 Close
               </button>
@@ -123,7 +182,7 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
     );
   }
 
-  // Original login/signup form for non-logged in users
+  // Login/Signup form for non-logged in users
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -185,14 +244,14 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
           <div className="input-group">
             <label>
               <i className="fas fa-envelope"></i>
-              Email
+              Email / Username
             </label>
             <input
-              type="email"
+              type="text"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="john@example.com"
+              placeholder="Email or admin username"
               required
             />
           </div>
@@ -214,7 +273,8 @@ const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
 
           {isLogin && (
             <div className="demo-credentials">
-              <p><strong>Demo:</strong> user@example.com / password123</p>
+              <p><strong>User Demo:</strong> user@example.com / password123</p>
+              <p><strong>Admin Login:</strong> admin / admin123</p>
             </div>
           )}
 

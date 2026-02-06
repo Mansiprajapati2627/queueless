@@ -10,6 +10,8 @@ import OrderTrackingPage from './pages/OrderTrackingPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import TableScanner from './pages/TableScanner';
 import LoginModal from './components/LoginModal';
+import AdminRedirect from './pages/AdminRedirect';
+import AdminAccess from './components/AdminAccess';
 import './App.css';
 
 function App() {
@@ -66,7 +68,9 @@ function App() {
     setUser(null);
     setCart([]);
     setTableNumber(null);
-    localStorage.clear();
+    localStorage.removeItem('queueless_user');
+    localStorage.removeItem('queueless_table');
+    localStorage.removeItem('queueless_cart');
     toast.success('Logged out successfully');
   };
 
@@ -318,6 +322,12 @@ function App() {
               <BottomNav activeOrdersCount={activeOrders.length} />
             </>
           } />
+          
+          {/* Admin Route */}
+          <Route path="/admin" element={<AdminRedirect />} />
+          
+          {/* Catch all route - redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
         {showLoginModal && (
@@ -329,8 +339,12 @@ function App() {
             user={user}
           />
         )}
+
+        {/* Admin Access Button (hidden in corner) */}
+        <AdminAccess />
       </div>
     </Router>
   );
 }
+
 export default App;

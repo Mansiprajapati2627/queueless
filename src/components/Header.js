@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Header = ({ user, tableNumber, cartCount, onShowLogin }) => {
+  const isAdmin = user?.role === 'admin' || localStorage.getItem('queueless_admin');
+  
   return (
     <header className="header">
       <div className="header-logo">
@@ -16,6 +18,23 @@ const Header = ({ user, tableNumber, cartCount, onShowLogin }) => {
       </div>
       
       <div className="header-actions">
+        {isAdmin ? (
+          <button 
+            onClick={() => window.location.href = '/admin/index.html'}
+            className="btn btn-dark"
+            style={{ 
+              padding: '0.5rem 1rem', 
+              fontSize: '0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <i className="fas fa-user-shield"></i>
+            <span>Admin</span>
+          </button>
+        ) : null}
+        
         {user ? (
           <button 
             onClick={onShowLogin}
