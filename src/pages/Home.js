@@ -7,31 +7,22 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
   const [manualTable, setManualTable] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Enhanced slides with college canteen focus
+  // Slideshow images - College canteen focused
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1920&h=1080&fit=crop",
-      title: "COLLEGE CANTEEN DELIGHTS",
-      subtitle: "Quick, delicious meals between classes",
-      cta: "ORDER NOW"
+      image: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1200&h=600&fit=crop",
+      title: "College Canteen Delights",
+      subtitle: "Quick, delicious meals between classes"
     },
     {
-      image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1920&h=1080&fit=crop",
-      title: "STUDENT-FRIENDLY PRICES",
-      subtitle: "Quality food that fits your budget",
-      cta: "VIEW MENU"
+      image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&h=600&fit=crop",
+      title: "Student-Friendly Prices",
+      subtitle: "Quality food that fits your budget"
     },
     {
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1920&h=1080&fit=crop",
-      title: "QUICK SERVICE",
-      subtitle: "Get your food fast, get back to class faster",
-      cta: "GET STARTED"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920&h=1080&fit=crop",
-      title: "STUDENT SPECIAL",
-      subtitle: "Show your college ID for 10% discount",
-      cta: "CLAIM OFFER"
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200&h=600&fit=crop",
+      title: "Quick Service",
+      subtitle: "Get your food fast, get back to class faster"
     }
   ];
 
@@ -43,7 +34,7 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
       description: "Burger + Fries + Cold Drink - Perfect value meal",
       price: 180,
       image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
-      tag: "Bestseller"
+      tag: "Best Seller"
     },
     {
       id: 2,
@@ -59,7 +50,7 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
       description: "Energy boost for those long study sessions",
       price: 80,
       image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop",
-      tag: "Offer"
+      tag: "Exam Special"
     }
   ];
 
@@ -68,7 +59,7 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
     {
       icon: "fas fa-clock",
       title: "Quick Service",
-      description: "Under 10-minute average waiting time"
+      description: "Under 10-minute waiting time"
     },
     {
       icon: "fas fa-rupee-sign",
@@ -139,65 +130,19 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
 
   return (
     <main className="main-content">
-      {/* Full Screen Slideshow Section */}
-      <section className="fullscreen-slideshow">
-        <div className="slideshow-wrapper">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className={`fullscreen-slide ${index === currentSlide ? 'active' : ''}`}
-              style={{
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${slide.image})`
-              }}
-            >
-              <div className="slide-content-wrapper">
-                <div className="slide-text-content">
-                  <h1 className="slide-main-title">{slide.title}</h1>
-                  <p className="slide-sub-text">{slide.subtitle}</p>
-                  <button 
-                    onClick={handleGetStarted}
-                    className="btn-slide-cta"
-                  >
-                    {!user ? 'LOGIN TO ORDER' : !tableNumber ? 'SCAN TABLE' : 'BROWSE MENU'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {/* Navigation Arrows */}
-          <button
-            onClick={handlePrevSlide}
-            className="slide-arrow slide-arrow-left"
-          >
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button
-            onClick={handleNextSlide}
-            className="slide-arrow slide-arrow-right"
-          >
-            <i className="fas fa-chevron-right"></i>
-          </button>
-          
-          {/* Dots Indicator */}
-          <div className="slide-indicators">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`slide-indicator ${index === currentSlide ? 'active' : ''}`}
-              />
-            ))}
-          </div>
-          
-          {/* Bottom gradient overlay */}
-          <div className="slide-bottom-gradient"></div>
-        </div>
-      </section>
-
       {/* College Announcement Banner */}
-      <div className="college-banner" style={{ marginTop: '0' }}>
-        <p><strong>STUDENT SPECIAL:</strong> Show your college ID for 10% discount on all orders!</p>
+      <div className="college-banner" style={{
+        background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
+        color: 'white',
+        padding: '1rem 2rem',
+        textAlign: 'center',
+        borderRadius: 'var(--border-radius)',
+        marginBottom: '2rem',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: '500' }}>
+          <strong>STUDENT SPECIAL:</strong> Show your college ID for 10% discount on all orders!
+        </p>
         <button 
           onClick={() => navigate('/menu')}
           className="btn btn-sm"
@@ -205,33 +150,198 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
             background: 'white',
             color: 'var(--primary)',
             marginTop: '0.5rem',
-            padding: '0.25rem 1rem',
-            fontWeight: '600'
+            padding: '0.25rem 1rem'
           }}
         >
           VIEW MENU
         </button>
       </div>
 
+      {/* Slideshow Section */}
+      <section className="slideshow-section" style={{ marginBottom: '3rem' }}>
+        <div className="slideshow-container" style={{
+          position: 'relative',
+          borderRadius: 'var(--border-radius-lg)',
+          overflow: 'hidden',
+          height: '400px',
+          boxShadow: 'var(--shadow-lg)'
+        }}>
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`slide ${index === currentSlide ? 'active' : ''}`}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                opacity: index === currentSlide ? 1 : 0,
+                transition: 'opacity 0.8s ease',
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${slide.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white'
+              }}
+            >
+              <div style={{ textAlign: 'center', padding: '2rem', maxWidth: '600px' }}>
+                <h1 style={{ 
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: '2.5rem',
+                  marginBottom: '1rem',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+                }}>
+                  {slide.title}
+                </h1>
+                <p style={{ 
+                  fontSize: '1.2rem',
+                  marginBottom: '2rem',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                }}>
+                  {slide.subtitle}
+                </p>
+                <button 
+                  onClick={handleGetStarted}
+                  className="btn btn-primary"
+                  style={{ fontSize: '1.1rem', padding: '0.75rem 2rem' }}
+                >
+                  {!user ? 'Login to Order' : !tableNumber ? 'Scan Table' : 'Browse Menu'}
+                </button>
+              </div>
+            </div>
+          ))}
+          
+          {/* Navigation Arrows */}
+          <button
+            onClick={handlePrevSlide}
+            style={{
+              position: 'absolute',
+              left: '1rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              color: 'white',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              backdropFilter: 'blur(5px)'
+            }}
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <button
+            onClick={handleNextSlide}
+            style={{
+              position: 'absolute',
+              right: '1rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              color: 'white',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              backdropFilter: 'blur(5px)'
+            }}
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
+          
+          {/* Dots Indicator */}
+          <div style={{
+            position: 'absolute',
+            bottom: '1rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '0.5rem'
+          }}>
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: index === currentSlide ? 'white' : 'rgba(255,255,255,0.5)',
+                  cursor: 'pointer',
+                  padding: 0
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* A Place to Talk Section - College Edition */}
-      <section className="place-to-talk-section">
-        <div className="place-to-talk-content">
-          <div className="place-to-talk-text">
-            <h2 className="place-to-talk-title">The Campus Hangout</h2>
-            <p className="place-to-talk-description">
+      <section className="place-to-talk-section" style={{
+        marginBottom: '3rem',
+        padding: '3rem 2rem',
+        background: 'var(--white)',
+        borderRadius: 'var(--border-radius-lg)',
+        boxShadow: 'var(--shadow)',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '3rem',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
+          <div style={{ flex: 1, minWidth: '300px', textAlign: 'left' }}>
+            <h2 style={{ 
+              fontFamily: 'var(--font-serif)',
+              fontSize: '2.2rem',
+              color: 'var(--charcoal)',
+              marginBottom: '1rem'
+            }}>
+              The Campus Hangout
+            </h2>
+            <p style={{ 
+              color: 'var(--charcoal-light)',
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
+              marginBottom: '1.5rem'
+            }}>
               Your go-to spot between classes! With seating for 25+ students, it's the perfect place 
               to grab a quick bite, study with friends, or just relax. Fast service, student-friendly 
               prices, and free WiFi.
             </p>
-            <div className="place-to-talk-features">
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               {canteenFeatures.map((feature, index) => (
-                <div key={index} className="place-to-talk-feature">
-                  <div className="feature-icon-container">
+                <div key={index} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '1rem'
+                }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: 'var(--gray-100)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--primary)'
+                  }}>
                     <i className={feature.icon}></i>
                   </div>
                   <div>
-                    <div className="feature-title">{feature.title}</div>
-                    <div className="feature-description">{feature.description}</div>
+                    <div style={{ fontWeight: '600', color: 'var(--charcoal)' }}>{feature.title}</div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--charcoal-light)' }}>{feature.description}</div>
                   </div>
                 </div>
               ))}
@@ -244,33 +354,92 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
               VIEW MENU
             </button>
           </div>
-          <div 
-            className="place-to-talk-image"
-            style={{
-              backgroundImage: 'url(https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop)'
-            }}
-          />
+          <div style={{ flex: 1, minWidth: '300px' }}>
+            <div style={{
+              borderRadius: 'var(--border-radius-lg)',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-lg)',
+              height: '300px',
+              backgroundImage: 'url(https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }} />
+          </div>
         </div>
       </section>
 
       {/* Daily Specials Section */}
-      <section className="daily-specials">
-        <h3 className="daily-specials-title">🎓 This Week's Specials</h3>
-        <div className="daily-specials-grid">
+      <section className="daily-specials" style={{
+        background: 'var(--gray-100)',
+        padding: '2rem',
+        borderRadius: 'var(--border-radius-lg)',
+        marginBottom: '2rem',
+        textAlign: 'center'
+      }}>
+        <h3 style={{ 
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1.8rem',
+          color: 'var(--charcoal)',
+          marginBottom: '1.5rem'
+        }}>
+          🎓 This Week's Specials
+        </h3>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '1rem',
+          flexWrap: 'wrap'
+        }}>
           {dailySpecials.map((special, index) => (
-            <div key={index} className="daily-special-card">
-              <div className="daily-special-day">{special.day}</div>
-              <div className="daily-special-name">{special.special}</div>
-              <div className="daily-special-price">{special.price}</div>
+            <div key={index} style={{
+              background: 'var(--white)',
+              padding: '1rem',
+              borderRadius: 'var(--border-radius)',
+              minWidth: '120px',
+              boxShadow: 'var(--shadow-sm)',
+              textAlign: 'center'
+            }}>
+              <div style={{ 
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                color: 'var(--primary)',
+                marginBottom: '0.5rem'
+              }}>
+                {special.day}
+              </div>
+              <div style={{ 
+                fontWeight: '600',
+                color: 'var(--charcoal)',
+                marginBottom: '0.25rem'
+              }}>
+                {special.special}
+              </div>
+              <div style={{ 
+                color: 'var(--primary)',
+                fontWeight: '700'
+              }}>
+                {special.price}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Featured Menu Section */}
-      <section className="featured-menu-section">
-        <div className="featured-menu-header">
-          <h2 className="featured-menu-title">Student Favorites</h2>
+      <section className="featured-menu-section" style={{ marginBottom: '3rem' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '2rem'
+        }}>
+          <h2 style={{ 
+            fontFamily: 'var(--font-serif)',
+            fontSize: '2rem',
+            color: 'var(--charcoal)'
+          }}>
+            Student Favorites
+          </h2>
           <button 
             onClick={() => navigate('/menu')}
             className="btn btn-secondary"
@@ -279,29 +448,85 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
           </button>
         </div>
         
-        <div className="featured-menu-grid">
+        <div className="featured-menu-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '1.5rem'
+        }}>
           {featuredMenuItems.map((item) => (
             <div 
               key={item.id}
               className="featured-menu-card"
               onClick={() => navigate('/menu')}
+              style={{
+                background: 'var(--white)',
+                borderRadius: 'var(--border-radius-lg)',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow)',
+                cursor: 'pointer',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'var(--shadow)';
+              }}
             >
-              <div 
-                className="featured-menu-image"
-                style={{ backgroundImage: `url(${item.image})` }}
-              >
+              <div style={{ position: 'relative' }}>
+                <div style={{
+                  height: '200px',
+                  backgroundImage: `url(${item.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }} />
                 {item.tag && (
-                  <div className={`featured-menu-tag ${item.tag === 'Offer' ? 'offer-tag' : ''}`}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    left: '1rem',
+                    background: 'var(--primary)',
+                    color: 'white',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600'
+                  }}>
                     {item.tag}
                   </div>
                 )}
               </div>
-              <div className="featured-menu-content">
-                <div className="featured-menu-header-inner">
-                  <h3 className="featured-menu-name">{item.name}</h3>
-                  <span className="featured-menu-price">₹{item.price}</span>
+              <div style={{ padding: '1.5rem' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: '0.5rem'
+                }}>
+                  <h3 style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '1.25rem',
+                    color: 'var(--charcoal)',
+                    margin: 0
+                  }}>
+                    {item.name}
+                  </h3>
+                  <span style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '700',
+                    color: 'var(--primary)'
+                  }}>
+                    ₹{item.price}
+                  </span>
                 </div>
-                <p className="featured-menu-description">
+                <p style={{
+                  color: 'var(--charcoal-light)',
+                  fontSize: '0.875rem',
+                  marginBottom: '1rem',
+                  lineHeight: '1.5'
+                }}>
                   {item.description}
                 </p>
               </div>
@@ -311,58 +536,141 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
       </section>
 
       {/* Quick Order Process */}
-      <section className="order-process">
-        <h3 className="order-process-title">How Queueless Works</h3>
-        <div className="order-process-steps">
-          <div className="process-step">
-            <div className="step-icon-container">
+      <section className="order-process" style={{
+        background: 'var(--white)',
+        padding: '3rem 2rem',
+        borderRadius: 'var(--border-radius-lg)',
+        marginBottom: '2rem',
+        textAlign: 'center',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <h3 style={{ 
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1.8rem',
+          color: 'var(--charcoal)',
+          marginBottom: '2rem'
+        }}>
+          How Queueless Works
+        </h3>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '2rem',
+          textAlign: 'center'
+        }}>
+          <div>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'var(--gray-100)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'var(--primary)',
+              fontSize: '1.5rem'
+            }}>
               <i className="fas fa-qrcode"></i>
             </div>
-            <h4 className="step-title">1. Scan Table QR</h4>
-            <p className="step-description">Scan the QR code at your table</p>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--charcoal)' }}>1. Scan Table QR</h4>
+            <p style={{ color: 'var(--charcoal-light)', fontSize: '0.9rem' }}>Scan the QR code at your table</p>
           </div>
-          <div className="process-step">
-            <div className="step-icon-container">
+          <div>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'var(--gray-100)',
+              display: flex,
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'var(--primary)',
+              fontSize: '1.5rem'
+            }}>
               <i className="fas fa-utensils"></i>
             </div>
-            <h4 className="step-title">2. Order Food</h4>
-            <p className="step-description">Browse menu & add items to cart</p>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--charcoal)' }}>2. Order Food</h4>
+            <p style={{ color: 'var(--charcoal-light)', fontSize: '0.9rem' }}>Browse menu & add items to cart</p>
           </div>
-          <div className="process-step">
-            <div className="step-icon-container">
+          <div>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'var(--gray-100)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'var(--primary)',
+              fontSize: '1.5rem'
+            }}>
               <i className="fas fa-mobile-alt"></i>
             </div>
-            <h4 className="step-title">3. Pay Online</h4>
-            <p className="step-description">Secure UPI or card payment</p>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--charcoal)' }}>3. Pay Online</h4>
+            <p style={{ color: 'var(--charcoal-light)', fontSize: '0.9rem' }}>Secure UPI or card payment</p>
           </div>
-          <div className="process-step">
-            <div className="step-icon-container">
+          <div>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'var(--gray-100)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1rem',
+              color: 'var(--primary)',
+              fontSize: '1.5rem'
+            }}>
               <i className="fas fa-clock"></i>
             </div>
-            <h4 className="step-title">4. Track Order</h4>
-            <p className="step-description">Real-time updates till delivery</p>
+            <h4 style={{ marginBottom: '0.5rem', color: 'var(--charcoal)' }}>4. Track Order</h4>
+            <p style={{ color: 'var(--charcoal-light)', fontSize: '0.9rem' }}>Real-time updates till delivery</p>
           </div>
         </div>
       </section>
 
       {/* Student Discount Banner */}
-      <div className="student-discount-banner">
-        <h3 className="student-discount-title">🎓 Student Benefits 🎓</h3>
-        <p className="student-discount-description">
+      <div className="student-discount-banner" style={{
+        background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%)',
+        color: 'white',
+        padding: '2rem',
+        borderRadius: 'var(--border-radius-lg)',
+        margin: '3rem 0',
+        textAlign: 'center',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <h3 style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1.8rem',
+          marginBottom: '1rem'
+        }}>
+          🎓 Student Benefits 🎓
+        </h3>
+        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', maxWidth: '600px', margin: '0 auto' }}>
           Show your college ID and get exclusive student discounts! Perfect for budget-friendly meals between classes.
         </p>
-        <div className="student-benefits">
-          <div className="student-benefit">
-            <div className="benefit-value">10% OFF</div>
-            <div className="benefit-description">All Orders</div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '2rem',
+          flexWrap: 'wrap',
+          marginTop: '1.5rem'
+        }}>
+          <div>
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>10% OFF</div>
+            <div style={{ fontSize: '0.9rem' }}>All Orders</div>
           </div>
-          <div className="student-benefit">
-            <div className="benefit-value">Free Drink</div>
-            <div className="benefit-description">On Orders Above ₹300</div>
+          <div>
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>Free Drink</div>
+            <div style={{ fontSize: '0.9rem' }}>On Orders Above ₹300</div>
           </div>
-          <div className="student-benefit">
-            <div className="benefit-value">Group Deals</div>
-            <div className="benefit-description">Special Rates for Friends</div>
+          <div>
+            <div style={{ fontSize: '2rem', fontWeight: '700' }}>Group Deals</div>
+            <div style={{ fontSize: '0.9rem' }}>Special Rates for Friends</div>
           </div>
         </div>
       </div>
@@ -423,12 +731,26 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
       )}
 
       {/* College Social Media */}
-      <div className="social-cta">
-        <h4 className="social-cta-title">Campus Updates</h4>
-        <p className="social-cta-description">
+      <div className="social-cta" style={{
+        textAlign: 'center',
+        padding: '2rem',
+        background: 'var(--white)',
+        borderRadius: 'var(--border-radius-lg)',
+        marginTop: '2rem',
+        boxShadow: 'var(--shadow)'
+      }}>
+        <h4 style={{ 
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1.5rem',
+          marginBottom: '1rem',
+          color: 'var(--charcoal)'
+        }}>
+          Campus Updates
+        </h4>
+        <p style={{ color: 'var(--charcoal-light)', marginBottom: '1.5rem' }}>
           Follow for daily specials, exam week deals, and campus events
         </p>
-        <div className="social-icons">
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
             <i className="fab fa-instagram"></i>
           </button>
@@ -486,246 +808,6 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
           </div>
         </div>
       )}
-
-      {/* Fullscreen Slideshow CSS */}
-      <style jsx>{`
-        .fullscreen-slideshow {
-          position: relative;
-          width: 100%;
-          height: 100vh;
-          min-height: 600px;
-          overflow: hidden;
-          margin-top: 0;
-        }
-        
-        .slideshow-wrapper {
-          width: 100%;
-          height: 100%;
-          position: relative;
-        }
-        
-        .fullscreen-slide {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
-          opacity: 0;
-          transition: opacity 1s ease-in-out;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        
-        .fullscreen-slide.active {
-          opacity: 1;
-        }
-        
-        .slide-content-wrapper {
-          width: 100%;
-          max-width: 1200px;
-          padding: 0 2rem;
-          text-align: center;
-          color: white;
-          z-index: 2;
-        }
-        
-        .slide-text-content {
-          animation: fadeInUp 1s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .slide-main-title {
-          font-size: 3.5rem;
-          font-weight: 700;
-          letter-spacing: 2px;
-          margin-bottom: 1rem;
-          text-transform: uppercase;
-          text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .slide-sub-text {
-          font-size: 1.5rem;
-          font-weight: 300;
-          margin-bottom: 2.5rem;
-          max-width: 600px;
-          margin-left: auto;
-          margin-right: auto;
-          text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
-        }
-        
-        .btn-slide-cta {
-          background: white;
-          color: var(--primary);
-          border: none;
-          padding: 1rem 3rem;
-          font-size: 1.1rem;
-          font-weight: 600;
-          border-radius: 30px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .btn-slide-cta:hover {
-          background: var(--primary);
-          color: white;
-          transform: translateY(-3px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        
-        .slide-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          background: rgba(255, 255, 255, 0.2);
-          color: white;
-          border: none;
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.5rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          z-index: 10;
-          backdrop-filter: blur(5px);
-        }
-        
-        .slide-arrow:hover {
-          background: rgba(255, 255, 255, 0.3);
-          transform: translateY(-50%) scale(1.1);
-        }
-        
-        .slide-arrow-left {
-          left: 2rem;
-        }
-        
-        .slide-arrow-right {
-          right: 2rem;
-        }
-        
-        .slide-indicators {
-          position: absolute;
-          bottom: 3rem;
-          left: 0;
-          right: 0;
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          z-index: 10;
-        }
-        
-        .slide-indicator {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 2px solid white;
-          background: transparent;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          padding: 0;
-        }
-        
-        .slide-indicator.active {
-          background: white;
-          transform: scale(1.2);
-        }
-        
-        .slide-bottom-gradient {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          height: 200px;
-          background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
-          pointer-events: none;
-        }
-        
-        .offer-tag {
-          background: #ff6b6b !important;
-          color: white !important;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 768px) {
-          .fullscreen-slideshow {
-            height: 80vh;
-            min-height: 500px;
-          }
-          
-          .slide-main-title {
-            font-size: 2.5rem;
-            letter-spacing: 1px;
-          }
-          
-          .slide-sub-text {
-            font-size: 1.2rem;
-            padding: 0 1rem;
-          }
-          
-          .btn-slide-cta {
-            padding: 0.8rem 2rem;
-            font-size: 1rem;
-          }
-          
-          .slide-arrow {
-            width: 50px;
-            height: 50px;
-            font-size: 1.2rem;
-          }
-          
-          .slide-arrow-left {
-            left: 1rem;
-          }
-          
-          .slide-arrow-right {
-            right: 1rem;
-          }
-          
-          .slide-indicators {
-            bottom: 2rem;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          .slide-main-title {
-            font-size: 2rem;
-          }
-          
-          .slide-sub-text {
-            font-size: 1rem;
-          }
-          
-          .btn-slide-cta {
-            padding: 0.7rem 1.5rem;
-            font-size: 0.9rem;
-          }
-          
-          .slide-arrow {
-            width: 40px;
-            height: 40px;
-            font-size: 1rem;
-          }
-        }
-      `}</style>
     </main>
   );
 };
