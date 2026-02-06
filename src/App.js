@@ -217,7 +217,12 @@ function App() {
         <Routes>
           <Route path="/" element={
             <>
-              <Header user={user} tableNumber={tableNumber} cartCount={cart.length} />
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)} 
+              />
               <Home 
                 user={user}
                 tableNumber={tableNumber}
@@ -232,7 +237,12 @@ function App() {
           
           <Route path="/menu" element={
             <ProtectedRoute>
-              <Header user={user} tableNumber={tableNumber} cartCount={cart.length} />
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)} 
+              />
               <MenuPage 
                 cart={cart}
                 addToCart={addToCart}
@@ -245,7 +255,12 @@ function App() {
           
           <Route path="/cart" element={
             <ProtectedRoute>
-              <Header user={user} tableNumber={tableNumber} cartCount={cart.length} />
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)} 
+              />
               <CartPage 
                 cart={cart}
                 updateQuantity={updateQuantity}
@@ -261,7 +276,12 @@ function App() {
           
           <Route path="/orders" element={
             <ProtectedRoute>
-              <Header user={user} tableNumber={tableNumber} cartCount={cart.length} />
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)} 
+              />
               <OrderTrackingPage 
                 activeOrders={activeOrders}
                 getOrderById={getOrderById}
@@ -285,7 +305,12 @@ function App() {
           
           <Route path="/scan" element={
             <>
-              <Header user={user} tableNumber={tableNumber} cartCount={cart.length} />
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)} 
+              />
               <TableScanner 
                 onScanComplete={handleTableScan}
                 user={user}
@@ -300,6 +325,8 @@ function App() {
             onClose={() => setShowLoginModal(false)}
             onLogin={handleLogin}
             onSignup={handleSignup}
+            onLogout={handleLogout}
+            user={user}
           />
         )}
       </div>

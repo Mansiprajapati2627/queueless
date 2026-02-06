@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const LoginModal = ({ onClose, onLogin, onSignup }) => {
+const LoginModal = ({ onClose, onLogin, onSignup, onLogout, user }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -45,6 +45,85 @@ const LoginModal = ({ onClose, onLogin, onSignup }) => {
     });
   };
 
+  const handleLogoutClick = () => {
+    if (onLogout) {
+      onLogout();
+      onClose();
+    }
+  };
+
+  // If user is already logged in, show logout option
+  if (user) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2><i className="fas fa-user-circle"></i> Account</h2>
+            <button onClick={onClose} className="btn-close">&times;</button>
+          </div>
+
+          <div className="modal-body">
+            <div style={{ textAlign: 'center', marginBottom: '2rem', width: '100%' }}>
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'var(--primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '2rem',
+                margin: '0 auto 1rem'
+              }}>
+                <i className="fas fa-user"></i>
+              </div>
+              <h3 style={{ marginBottom: '0.5rem', color: 'var(--charcoal)' }}>{user.name}</h3>
+              <p style={{ color: 'var(--charcoal-light)', marginBottom: '0.5rem' }}>{user.email}</p>
+              {user.phone && user.phone !== '0000000000' && (
+                <p style={{ color: 'var(--charcoal-light)' }}>
+                  <i className="fas fa-phone" style={{ marginRight: '0.5rem' }}></i>
+                  {user.phone}
+                </p>
+              )}
+            </div>
+
+            <div className="demo-credentials" style={{
+              background: 'var(--gray-100)',
+              padding: '1rem',
+              borderRadius: 'var(--border-radius)',
+              marginBottom: '1.5rem'
+            }}>
+              <p><strong>Demo Account:</strong> user@example.com / password123</p>
+              <p style={{ fontSize: '0.875rem', color: 'var(--charcoal-light)', marginTop: '0.5rem' }}>
+                You are currently logged in with demo credentials
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+              <button 
+                onClick={handleLogoutClick} 
+                className="btn btn-danger"
+                style={{ flex: 1 }}
+              >
+                <i className="fas fa-sign-out-alt"></i> Log Out
+              </button>
+              
+              <button 
+                onClick={onClose}
+                className="btn btn-secondary"
+                style={{ flex: 1 }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Original login/signup form for non-logged in users
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
