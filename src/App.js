@@ -12,7 +12,7 @@ import TableScanner from './pages/TableScanner';
 import LoginModal from './components/LoginModal';
 import AdminRedirect from './pages/AdminRedirect';
 import AdminAccess from './components/AdminAccess';
-import './App.css';
+import './App.css'; // ONLY App.css - NOT index.css
 
 function App() {
   const [user, setUser] = useState(null);

@@ -1,10 +1,108 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, onTableScan }) => {
   const navigate = useNavigate();
   const [showTableModal, setShowTableModal] = useState(false);
   const [manualTable, setManualTable] = useState('');
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Enhanced slides with college canteen focus
+  const slides = [
+    {
+      image: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1920&h=1080&fit=crop",
+      title: "COLLEGE CANTEEN DELIGHTS",
+      subtitle: "Quick, delicious meals between classes",
+      cta: "ORDER NOW"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1920&h=1080&fit=crop",
+      title: "STUDENT-FRIENDLY PRICES",
+      subtitle: "Quality food that fits your budget",
+      cta: "VIEW MENU"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1920&h=1080&fit=crop",
+      title: "QUICK SERVICE",
+      subtitle: "Get your food fast, get back to class faster",
+      cta: "GET STARTED"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1920&h=1080&fit=crop",
+      title: "STUDENT SPECIAL",
+      subtitle: "Show your college ID for 10% discount",
+      cta: "CLAIM OFFER"
+    }
+  ];
+
+  // Featured menu items for college students
+  const featuredMenuItems = [
+    {
+      id: 1,
+      name: "Combo Meal",
+      description: "Burger + Fries + Cold Drink - Perfect value meal",
+      price: 180,
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+      tag: "Bestseller"
+    },
+    {
+      id: 2,
+      name: "Coffee & Sandwich",
+      description: "Quick breakfast or study snack",
+      price: 120,
+      image: "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400&h=300&fit=crop",
+      tag: "Student Favorite"
+    },
+    {
+      id: 5,
+      name: "Cold Brew Coffee",
+      description: "Energy boost for those long study sessions",
+      price: 80,
+      image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop",
+      tag: "Offer"
+    }
+  ];
+
+  // College canteen features
+  const canteenFeatures = [
+    {
+      icon: "fas fa-clock",
+      title: "Quick Service",
+      description: "Under 10-minute average waiting time"
+    },
+    {
+      icon: "fas fa-rupee-sign",
+      title: "Student Budget",
+      description: "Meals starting from ₹50"
+    },
+    {
+      icon: "fas fa-wifi",
+      title: "Free WiFi",
+      description: "Study while you eat"
+    },
+    {
+      icon: "fas fa-users",
+      title: "Group Discounts",
+      description: "Special rates for groups"
+    }
+  ];
+
+  // Daily specials
+  const dailySpecials = [
+    { day: "Mon", special: "Pasta Day", price: "₹120" },
+    { day: "Tue", special: "Burger Combo", price: "₹150" },
+    { day: "Wed", special: "Pizza Special", price: "₹200" },
+    { day: "Thu", special: "Sandwich + Drink", price: "₹100" },
+    { day: "Fri", special: "Fries & Shake", price: "₹130" }
+  ];
+
+  // Auto-rotate slideshow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
 
   const handleGetStarted = () => {
     if (user) {
@@ -31,199 +129,317 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
     }
   };
 
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
   return (
     <main className="main-content">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <div style={{
-            fontSize: '4rem',
-            marginBottom: '20px',
-            color: 'white'
-          }}>
-            🍽️
-          </div>
-          <h1 className="hero-title">Welcome to Taste Haven</h1>
-          <p className="hero-subtitle">
-            Experience fine dining with zero wait time. Order directly from your table.
-          </p>
+      {/* Full Screen Slideshow Section */}
+      <section className="fullscreen-slideshow">
+        <div className="slideshow-wrapper">
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`fullscreen-slide ${index === currentSlide ? 'active' : ''}`}
+              style={{
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${slide.image})`
+              }}
+            >
+              <div className="slide-content-wrapper">
+                <div className="slide-text-content">
+                  <h1 className="slide-main-title">{slide.title}</h1>
+                  <p className="slide-sub-text">{slide.subtitle}</p>
+                  <button 
+                    onClick={handleGetStarted}
+                    className="btn-slide-cta"
+                  >
+                    {!user ? 'LOGIN TO ORDER' : !tableNumber ? 'SCAN TABLE' : 'BROWSE MENU'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
           
-          <div className="hero-actions">
-            {!tableNumber ? (
-              <>
-                <button onClick={() => navigate('/scan')} className="btn btn-primary">
-                  <i className="fas fa-qrcode"></i>
-                  Scan Table QR
-                </button>
-                <button onClick={() => setShowTableModal(true)} className="btn btn-secondary">
-                  Enter Table Manually
-                </button>
-              </>
-            ) : !user ? (
-              <button onClick={onShowLogin} className="btn btn-primary">
-                Login to Order
-              </button>
-            ) : (
-              <button onClick={() => navigate('/menu')} className="btn btn-primary">
-                <i className="fas fa-utensils"></i>
-                Browse Menu
-              </button>
-            )}
+          {/* Navigation Arrows */}
+          <button
+            onClick={handlePrevSlide}
+            className="slide-arrow slide-arrow-left"
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          <button
+            onClick={handleNextSlide}
+            className="slide-arrow slide-arrow-right"
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
+          
+          {/* Dots Indicator */}
+          <div className="slide-indicators">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`slide-indicator ${index === currentSlide ? 'active' : ''}`}
+              />
+            ))}
+          </div>
+          
+          {/* Bottom gradient overlay */}
+          <div className="slide-bottom-gradient"></div>
+        </div>
+      </section>
+
+      {/* College Announcement Banner */}
+      <div className="college-banner" style={{ marginTop: '0' }}>
+        <p><strong>STUDENT SPECIAL:</strong> Show your college ID for 10% discount on all orders!</p>
+        <button 
+          onClick={() => navigate('/menu')}
+          className="btn btn-sm"
+          style={{
+            background: 'white',
+            color: 'var(--primary)',
+            marginTop: '0.5rem',
+            padding: '0.25rem 1rem',
+            fontWeight: '600'
+          }}
+        >
+          VIEW MENU
+        </button>
+      </div>
+
+      {/* A Place to Talk Section - College Edition */}
+      <section className="place-to-talk-section">
+        <div className="place-to-talk-content">
+          <div className="place-to-talk-text">
+            <h2 className="place-to-talk-title">The Campus Hangout</h2>
+            <p className="place-to-talk-description">
+              Your go-to spot between classes! With seating for 25+ students, it's the perfect place 
+              to grab a quick bite, study with friends, or just relax. Fast service, student-friendly 
+              prices, and free WiFi.
+            </p>
+            <div className="place-to-talk-features">
+              {canteenFeatures.map((feature, index) => (
+                <div key={index} className="place-to-talk-feature">
+                  <div className="feature-icon-container">
+                    <i className={feature.icon}></i>
+                  </div>
+                  <div>
+                    <div className="feature-title">{feature.title}</div>
+                    <div className="feature-description">{feature.description}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button 
+              onClick={() => navigate('/menu')}
+              className="btn btn-secondary"
+              style={{ marginTop: '1rem' }}
+            >
+              VIEW MENU
+            </button>
+          </div>
+          <div 
+            className="place-to-talk-image"
+            style={{
+              backgroundImage: 'url(https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop)'
+            }}
+          />
+        </div>
+      </section>
+
+      {/* Daily Specials Section */}
+      <section className="daily-specials">
+        <h3 className="daily-specials-title">🎓 This Week's Specials</h3>
+        <div className="daily-specials-grid">
+          {dailySpecials.map((special, index) => (
+            <div key={index} className="daily-special-card">
+              <div className="daily-special-day">{special.day}</div>
+              <div className="daily-special-name">{special.special}</div>
+              <div className="daily-special-price">{special.price}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured Menu Section */}
+      <section className="featured-menu-section">
+        <div className="featured-menu-header">
+          <h2 className="featured-menu-title">Student Favorites</h2>
+          <button 
+            onClick={() => navigate('/menu')}
+            className="btn btn-secondary"
+          >
+            View Full Menu
+          </button>
+        </div>
+        
+        <div className="featured-menu-grid">
+          {featuredMenuItems.map((item) => (
+            <div 
+              key={item.id}
+              className="featured-menu-card"
+              onClick={() => navigate('/menu')}
+            >
+              <div 
+                className="featured-menu-image"
+                style={{ backgroundImage: `url(${item.image})` }}
+              >
+                {item.tag && (
+                  <div className={`featured-menu-tag ${item.tag === 'Offer' ? 'offer-tag' : ''}`}>
+                    {item.tag}
+                  </div>
+                )}
+              </div>
+              <div className="featured-menu-content">
+                <div className="featured-menu-header-inner">
+                  <h3 className="featured-menu-name">{item.name}</h3>
+                  <span className="featured-menu-price">₹{item.price}</span>
+                </div>
+                <p className="featured-menu-description">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Quick Order Process */}
+      <section className="order-process">
+        <h3 className="order-process-title">How Queueless Works</h3>
+        <div className="order-process-steps">
+          <div className="process-step">
+            <div className="step-icon-container">
+              <i className="fas fa-qrcode"></i>
+            </div>
+            <h4 className="step-title">1. Scan Table QR</h4>
+            <p className="step-description">Scan the QR code at your table</p>
+          </div>
+          <div className="process-step">
+            <div className="step-icon-container">
+              <i className="fas fa-utensils"></i>
+            </div>
+            <h4 className="step-title">2. Order Food</h4>
+            <p className="step-description">Browse menu & add items to cart</p>
+          </div>
+          <div className="process-step">
+            <div className="step-icon-container">
+              <i className="fas fa-mobile-alt"></i>
+            </div>
+            <h4 className="step-title">3. Pay Online</h4>
+            <p className="step-description">Secure UPI or card payment</p>
+          </div>
+          <div className="process-step">
+            <div className="step-icon-container">
+              <i className="fas fa-clock"></i>
+            </div>
+            <h4 className="step-title">4. Track Order</h4>
+            <p className="step-description">Real-time updates till delivery</p>
           </div>
         </div>
       </section>
 
-      {/* Restaurant Highlights */}
+      {/* Student Discount Banner */}
+      <div className="student-discount-banner">
+        <h3 className="student-discount-title">🎓 Student Benefits 🎓</h3>
+        <p className="student-discount-description">
+          Show your college ID and get exclusive student discounts! Perfect for budget-friendly meals between classes.
+        </p>
+        <div className="student-benefits">
+          <div className="student-benefit">
+            <div className="benefit-value">10% OFF</div>
+            <div className="benefit-description">All Orders</div>
+          </div>
+          <div className="student-benefit">
+            <div className="benefit-value">Free Drink</div>
+            <div className="benefit-description">On Orders Above ₹300</div>
+          </div>
+          <div className="student-benefit">
+            <div className="benefit-value">Group Deals</div>
+            <div className="benefit-description">Special Rates for Friends</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Features */}
       <section className="features-section">
-        <h2 className="section-title">Why Dine With us? </h2>
+        <h2 className="section-title">Why Choose Queueless?</h2>
         <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-bolt"></i>
+            </div>
+            <h3>Fast Service</h3>
+            <p>Under 10-minute average waiting time</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-rupee-sign"></i>
+            </div>
+            <h3>Student Budget</h3>
+            <p>Affordable prices for students</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <i className="fas fa-wifi"></i>
+            </div>
+            <h3>Free WiFi</h3>
+            <p>Study while you wait</p>
+          </div>
           <div className="feature-card">
             <div className="feature-icon">
               <i className="fas fa-clock"></i>
             </div>
-            <h3>Fast Service</h3>
-            <p>Average serving time: 15 minutes</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-star"></i>
-            </div>
-            <h3>Premium Quality</h3>
-            <p>Fresh ingredients, expert chefs</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-leaf"></i>
-            </div>
-            <h3>Fresh & Local</h3>
-            <p>Locally sourced ingredients</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-user-friends"></i>
-            </div>
-            <h3>Family Friendly</h3>
-            <p>Special menu for kids</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Today's Specials */}
-      <section style={{ width: '100%', padding: '0 20px', marginTop: '40px' }}>
-        <h2 className="section-title">Today's Specials</h2>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '20px',
-          marginTop: '20px'
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: '20px',
-            boxShadow: 'var(--shadow)',
-            textAlign: 'center',
-            border: '2px solid var(--primary)',
-            transition: 'transform 0.3s'
-          }}>
-            <div style={{
-              fontSize: '2rem',
-              marginBottom: '10px',
-              color: 'var(--primary)'
-            }}>🔥</div>
-            <h3>Chef's Special</h3>
-            <p>Signature Biryani with Raita</p>
-            <div style={{
-              color: 'var(--primary)',
-              fontWeight: '600',
-              marginTop: '10px'
-            }}>₹350</div>
-          </div>
-          
-          <div style={{
-            background: 'white',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: '20px',
-            boxShadow: 'var(--shadow)',
-            textAlign: 'center',
-            border: '2px solid var(--success)',
-            transition: 'transform 0.3s'
-          }}>
-            <div style={{
-              fontSize: '2rem',
-              marginBottom: '10px',
-              color: 'var(--success)'
-            }}>🥬</div>
-            <h3>Healthy Choice</h3>
-            <p>Fresh Salad Bowl</p>
-            <div style={{
-              color: 'var(--success)',
-              fontWeight: '600',
-              marginTop: '10px'
-            }}>₹180</div>
-          </div>
-          
-          <div style={{
-            background: 'white',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: '20px',
-            boxShadow: 'var(--shadow)',
-            textAlign: 'center',
-            border: '2px solid var(--warning)',
-            transition: 'transform 0.3s'
-          }}>
-            <div style={{
-              fontSize: '2rem',
-              marginBottom: '10px',
-              color: 'var(--warning)'
-            }}>🍰</div>
-            <h3>Dessert Special</h3>
-            <p>Chocolate Lava Cake</p>
-            <div style={{
-              color: 'var(--warning)',
-              fontWeight: '600',
-              marginTop: '10px'
-            }}>₹220</div>
+            <h3>No Queues</h3>
+            <p>Order from your table, skip the line</p>
           </div>
         </div>
       </section>
 
       {/* Status Section */}
       {user && tableNumber && (
-        <div className="status-section" style={{ width: '100%', padding: '0 20px', marginTop: '40px' }}>
+        <div className="status-section" style={{ width: '100%' }}>
           <div className="card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
-              <div style={{
-                width: '50px',
-                height: '50px',
-                background: 'var(--primary)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '1.5rem'
-              }}>
-                <i className="fas fa-chair"></i>
-              </div>
-              <div>
-                <h3>Ready to Order!</h3>
-                <p>You're at Table {tableNumber}</p>
-              </div>
-            </div>
+            <h3>Ready to Order!</h3>
+            <p>You're logged in and at Table {tableNumber}</p>
             <div className="status-actions">
               <button onClick={() => navigate('/menu')} className="btn btn-primary">
-                <i className="fas fa-utensils"></i> View Menu
+                View Menu
               </button>
               {cartCount > 0 && (
                 <button onClick={() => navigate('/cart')} className="btn btn-secondary">
-                  <i className="fas fa-shopping-cart"></i> View Cart ({cartCount} items)
+                  View Cart ({cartCount} items)
                 </button>
               )}
             </div>
           </div>
         </div>
       )}
+
+      {/* College Social Media */}
+      <div className="social-cta">
+        <h4 className="social-cta-title">Campus Updates</h4>
+        <p className="social-cta-description">
+          Follow for daily specials, exam week deals, and campus events
+        </p>
+        <div className="social-icons">
+          <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
+            <i className="fab fa-instagram"></i>
+          </button>
+          <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
+            <i className="fab fa-whatsapp"></i>
+          </button>
+          <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
+            <i className="fas fa-envelope"></i>
+          </button>
+        </div>
+      </div>
 
       {/* Manual Table Modal */}
       {showTableModal && (
@@ -242,14 +458,8 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
                 value={manualTable}
                 onChange={(e) => setManualTable(e.target.value)}
                 placeholder="e.g., 12"
-                style={{
-                  padding: '12px 16px',
-                  border: '2px solid var(--gray-300)',
-                  borderRadius: 'var(--border-radius)',
-                  fontSize: '1rem',
-                  width: '100%',
-                  margin: '16px 0'
-                }}
+                className="input-group"
+                style={{ margin: '16px 0', width: '100%' }}
               />
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', margin: '16px 0', width: '100%' }}>
                 {Array.from({ length: 25 }, (_, i) => i + 1).map(num => (
@@ -257,16 +467,8 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
                     key={num}
                     type="button"
                     onClick={() => setManualTable(num.toString())}
-                    style={{ 
-                      padding: '8px', 
-                      width: '100%',
-                      background: manualTable === num.toString() ? 'var(--primary)' : 'white',
-                      color: manualTable === num.toString() ? 'white' : 'var(--dark)',
-                      border: `2px solid ${manualTable === num.toString() ? 'var(--primary)' : 'var(--gray-300)'}`,
-                      borderRadius: 'var(--border-radius)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s'
-                    }}
+                    className="btn btn-sm"
+                    style={{ padding: '8px', width: '100%' }}
                   >
                     {num}
                   </button>
@@ -278,12 +480,252 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
                 Cancel
               </button>
               <button onClick={handleTableSubmit} className="btn btn-primary">
-                Confirm Table
+                Confirm
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Fullscreen Slideshow CSS */}
+      <style jsx>{`
+        .fullscreen-slideshow {
+          position: relative;
+          width: 100%;
+          height: 100vh;
+          min-height: 600px;
+          overflow: hidden;
+          margin-top: 0;
+        }
+        
+        .slideshow-wrapper {
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+        
+        .fullscreen-slide {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0;
+          transition: opacity 1s ease-in-out;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .fullscreen-slide.active {
+          opacity: 1;
+        }
+        
+        .slide-content-wrapper {
+          width: 100%;
+          max-width: 1200px;
+          padding: 0 2rem;
+          text-align: center;
+          color: white;
+          z-index: 2;
+        }
+        
+        .slide-text-content {
+          animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .slide-main-title {
+          font-size: 3.5rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+          margin-bottom: 1rem;
+          text-transform: uppercase;
+          text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .slide-sub-text {
+          font-size: 1.5rem;
+          font-weight: 300;
+          margin-bottom: 2.5rem;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
+          text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+        }
+        
+        .btn-slide-cta {
+          background: white;
+          color: var(--primary);
+          border: none;
+          padding: 1rem 3rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+          border-radius: 30px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-slide-cta:hover {
+          background: var(--primary);
+          color: white;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .slide-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: none;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          z-index: 10;
+          backdrop-filter: blur(5px);
+        }
+        
+        .slide-arrow:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: translateY(-50%) scale(1.1);
+        }
+        
+        .slide-arrow-left {
+          left: 2rem;
+        }
+        
+        .slide-arrow-right {
+          right: 2rem;
+        }
+        
+        .slide-indicators {
+          position: absolute;
+          bottom: 3rem;
+          left: 0;
+          right: 0;
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          z-index: 10;
+        }
+        
+        .slide-indicator {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          border: 2px solid white;
+          background: transparent;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          padding: 0;
+        }
+        
+        .slide-indicator.active {
+          background: white;
+          transform: scale(1.2);
+        }
+        
+        .slide-bottom-gradient {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 200px;
+          background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+          pointer-events: none;
+        }
+        
+        .offer-tag {
+          background: #ff6b6b !important;
+          color: white !important;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+          .fullscreen-slideshow {
+            height: 80vh;
+            min-height: 500px;
+          }
+          
+          .slide-main-title {
+            font-size: 2.5rem;
+            letter-spacing: 1px;
+          }
+          
+          .slide-sub-text {
+            font-size: 1.2rem;
+            padding: 0 1rem;
+          }
+          
+          .btn-slide-cta {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+          }
+          
+          .slide-arrow {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+          }
+          
+          .slide-arrow-left {
+            left: 1rem;
+          }
+          
+          .slide-arrow-right {
+            right: 1rem;
+          }
+          
+          .slide-indicators {
+            bottom: 2rem;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .slide-main-title {
+            font-size: 2rem;
+          }
+          
+          .slide-sub-text {
+            font-size: 1rem;
+          }
+          
+          .btn-slide-cta {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9rem;
+          }
+          
+          .slide-arrow {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+          }
+        }
+      `}</style>
     </main>
   );
 };
