@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Header = ({ user, tableNumber, cartCount }) => {
+const Header = ({ user, tableNumber, cartCount, onShowLogin }) => {
   return (
     <header className="header">
       <div className="header-logo">
@@ -16,11 +16,42 @@ const Header = ({ user, tableNumber, cartCount }) => {
       </div>
       
       <div className="header-actions">
-        {user && (
-          <div className="user-info">
-            <i className="fas fa-user"></i>
-            <span>{user.name}</span>
-          </div>
+        {user ? (
+          <button 
+            onClick={onShowLogin}
+            className="btn btn-secondary"
+            style={{ 
+              padding: '0.5rem 1rem', 
+              fontSize: '0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'transparent',
+              color: 'var(--primary)',
+              border: '2px solid var(--primary)',
+              borderRadius: 'var(--border-radius)',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+          >
+            <i className="fas fa-user-circle"></i>
+            <span>{user.name.split(' ')[0]}</span>
+          </button>
+        ) : (
+          <button 
+            onClick={onShowLogin}
+            className="btn btn-primary"
+            style={{ 
+              padding: '0.5rem 1rem', 
+              fontSize: '0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <i className="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+          </button>
         )}
         
         <Link to="/cart" className="cart-icon">
