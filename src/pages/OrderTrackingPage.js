@@ -19,7 +19,7 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
     confirmed: 'fas fa-check-circle',
     preparing: 'fas fa-utensils',
     ready: 'fas fa-check-circle',
-    served: 'fas fa-truck',
+    served: 'fas fa-concierge-bell',
     completed: 'fas fa-shopping-bag'
   };
 
@@ -33,12 +33,12 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
   };
 
   const statusColors = {
-    pending: 'var(--warning)',
-    confirmed: 'var(--primary)',
-    preparing: 'var(--primary-dark)',
-    ready: 'var(--success)',
-    served: 'var(--secondary)',
-    completed: 'var(--gray-600)'
+    pending: '#ff9800',
+    confirmed: '#2196f3',
+    preparing: '#4CAF50',
+    ready: '#8BC34A',
+    served: '#673ab7',
+    completed: '#9e9e9e'
   };
 
   const renderTimeline = (order) => {
@@ -52,11 +52,17 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
           
           return (
             <div key={status} className="timeline-item">
-              <div className={`timeline-dot ${isCompleted ? 'completed' : isActive ? 'active' : ''}`} />
+              <div 
+                className={`timeline-dot ${isCompleted ? 'completed' : isActive ? 'active' : ''}`}
+                style={{
+                  background: isCompleted ? statusColors[status] : 
+                            isActive ? statusColors[status] : 'var(--border)'
+                }}
+              />
               <div className="timeline-content">
                 <div className="timeline-header">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <i className={statusIcons[status]}></i>
+                    <i className={statusIcons[status]} style={{ color: statusColors[status] }}></i>
                     <h4>{statusLabels[status]}</h4>
                   </div>
                   <span style={{ 
@@ -102,19 +108,16 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
                       <h3 className="order-id">{order.id}</h3>
                       <p className="order-time">
                         {new Date(order.createdAt).toLocaleDateString()} • 
-                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • 
+                        Table {order.tableNumber}
                       </p>
                     </div>
-                    <div className="order-status">
-                      <span className="badge" style={{ 
-                        background: statusColors[order.status],
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        fontSize: '0.75rem'
-                      }}>
-                        {statusLabels[order.status]}
-                      </span>
+                    <div className="order-status" style={{ 
+                      background: `${statusColors[order.status]}20`,
+                      color: statusColors[order.status]
+                    }}>
+                      <i className={statusIcons[order.id]} style={{ marginRight: '4px' }}></i>
+                      {statusLabels[order.status]}
                     </div>
                   </div>
                   
@@ -136,13 +139,16 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
                   <div className="order-footer">
                     <div className="order-total">
                       <span>Total:</span>
-                      <span className="total-amount">₹{order.total}</span>
+                      <span className="total-amount" style={{ color: 'var(--sage)', fontWeight: '700' }}>
+                        ₹{order.total}
+                      </span>
                     </div>
                     
                     <button
                       onClick={() => handleTrackOrder(order.id)}
                       className="btn btn-primary btn-sm"
                     >
+                      <i className="fas fa-map-marker-alt" style={{ marginRight: '4px' }}></i>
                       Track Order
                     </button>
                   </div>
@@ -154,6 +160,12 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
               <i className="fas fa-clock empty-state-icon"></i>
               <h3>No Active Orders</h3>
               <p>You don't have any active orders right now.</p>
+              <button 
+                onClick={() => window.location.href = '/menu'}
+                className="btn btn-primary"
+              >
+                Order Now
+              </button>
             </div>
           )}
         </div>
@@ -170,32 +182,46 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
                     <div>
                       <h3 className="order-id">{order.id}</h3>
                       <p className="order-time">
-                        {new Date(order.createdAt).toLocaleDateString()}
+                        {new Date(order.createdAt).toLocaleDateString()} • Table {order.tableNumber}
                       </p>
                     </div>
-                    <div className="order-status">
-                      <span className="badge" style={{ 
-                        background: 'var(--success)',
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '20px',
-                        fontSize: '0.75rem'
-                      }}>
-                        Completed
-                      </span>
+                    <div className="order-status" style={{ 
+                      background: `${statusColors.completed}20`,
+                      color: statusColors.completed
+                    }}>
+                      <i className={statusIcons.completed} style={{ marginRight: '4px' }}></i>
+                      Completed
                     </div>
+                  </div>
+                  
+                  <div className="order-items">
+                    {order.items.slice(0, 2).map((item, index) => (
+                      <div key={index} className="order-item">
+                        <span>{item.name} × {item.quantity}</span>
+                        <span>₹{item.price * item.quantity}</span>
+                      </div>
+                    ))}
+                    {order.items.length > 2 && (
+                      <div className="order-item">
+                        <span>+{order.items.length - 2} more items</span>
+                        <span></span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="order-footer">
                     <div className="order-total">
                       <span>Total:</span>
-                      <span className="total-amount">₹{order.total}</span>
+                      <span className="total-amount" style={{ color: 'var(--sage)', fontWeight: '700' }}>
+                        ₹{order.total}
+                      </span>
                     </div>
                     
                     <button
                       onClick={() => handleTrackOrder(order.id)}
                       className="btn btn-secondary btn-sm"
                     >
+                      <i className="fas fa-eye" style={{ marginRight: '4px' }}></i>
                       View Details
                     </button>
                   </div>
@@ -238,13 +264,14 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
                   <div className="order-id" style={{ 
                     fontFamily: 'monospace', 
                     fontSize: '1.125rem',
-                    marginBottom: '8px'
+                    marginBottom: '8px',
+                    fontWeight: '600'
                   }}>
                     {selectedOrder.id}
                   </div>
                   <div style={{ display: 'flex', gap: '16px', color: 'var(--gray-600)' }}>
-                    <span>Table {selectedOrder.tableNumber}</span>
-                    <span>₹{selectedOrder.total}</span>
+                    <span><i className="fas fa-chair"></i> Table {selectedOrder.tableNumber}</span>
+                    <span><i className="fas fa-rupee-sign"></i> ₹{selectedOrder.total}</span>
                   </div>
                 </div>
 
@@ -254,7 +281,7 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
 
                 {/* Estimated Time */}
                 <div className="estimated-time" style={{
-                  background: 'var(--gradient-primary)',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)',
                   color: 'white',
                   padding: '20px',
                   borderRadius: 'var(--border-radius-lg)',
@@ -291,6 +318,17 @@ const OrderTrackingPage = ({ activeOrders, getOrderById, user, tableNumber }) =>
                       </div>
                     </div>
                   ))}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '12px 0',
+                    borderTop: '2px solid var(--border)',
+                    marginTop: '12px',
+                    fontWeight: '600'
+                  }}>
+                    <div>Total</div>
+                    <div>₹{selectedOrder.total}</div>
+                  </div>
                 </div>
               </div>
             </div>

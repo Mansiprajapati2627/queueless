@@ -65,6 +65,22 @@ const menuItems = [
     price: 80,
     category: "beverages",
     image: "https://images.unsplash.com/photo-1621264968373-430b60e8af3b?w=400&h=300&fit=crop"
+  },
+  {
+    id: 9,
+    name: "French Fries",
+    description: "Crispy golden fries with seasoning",
+    price: 90,
+    category: "veg",
+    image: "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=400&h=300&fit=crop"
+  },
+  {
+    id: 10,
+    name: "Mango Shake",
+    description: "Fresh mango shake with cream",
+    price: 110,
+    category: "beverages",
+    image: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=400&h=300&fit=crop"
   }
 ];
 
@@ -152,6 +168,8 @@ const MenuPage = ({ cart, addToCart, updateQuantity, user }) => {
                     <div className={`item-category ${item.category}`}>
                       {item.category === 'veg' ? '🥬 Veg' : 
                        item.category === 'nonveg' ? '🍗 Non-Veg' : 
+                       item.category === 'beverages' ? '🥤 Drink' :
+                       item.category === 'desserts' ? '🍰 Dessert' :
                        item.category.toUpperCase()}
                     </div>
                   </div>
@@ -170,7 +188,7 @@ const MenuPage = ({ cart, addToCart, updateQuantity, user }) => {
                           onClick={() => addToCart(item)}
                           className="btn btn-primary btn-sm"
                         >
-                          Add to Cart
+                          <i className="fas fa-plus"></i> Add to Cart
                         </button>
                       ) : (
                         <div className="quantity-control">
@@ -178,14 +196,14 @@ const MenuPage = ({ cart, addToCart, updateQuantity, user }) => {
                             onClick={() => updateQuantity(item.id, -1)}
                             className="qty-btn"
                           >
-                            -
+                            <i className="fas fa-minus"></i>
                           </button>
                           <span className="qty-value">{quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, 1)}
                             className="qty-btn"
                           >
-                            +
+                            <i className="fas fa-plus"></i>
                           </button>
                         </div>
                       )}
@@ -209,7 +227,7 @@ const MenuPage = ({ cart, addToCart, updateQuantity, user }) => {
         <div className="quick-cart-summary">
           <div className="quick-cart-content">
             <div className="cart-info">
-              <span>{totalItems} items</span>
+              <span>{totalItems} items in cart</span>
               <span className="cart-total">₹{totalAmount}</span>
             </div>
             <button

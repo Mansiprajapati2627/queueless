@@ -30,7 +30,8 @@ const CartPage = ({
     
     const paymentData = {
       method: selectedPayment,
-      instructions: instructions
+      instructions: instructions,
+      amount: total
     };
 
     try {
@@ -40,7 +41,6 @@ const CartPage = ({
         if (selectedPayment === 'upi') {
           navigate('/payment/upi');
         } else {
-          // For other payment methods
           alert(`Order placed successfully! Order ID: ${order.id}`);
           navigate('/orders');
         }
@@ -96,6 +96,7 @@ const CartPage = ({
                     <button
                       onClick={() => removeFromCart(item.id)}
                       className="btn btn-icon btn-danger"
+                      style={{ background: 'var(--accent)', color: 'white', border: 'none' }}
                     >
                       <i className="fas fa-trash"></i>
                     </button>
@@ -120,7 +121,9 @@ const CartPage = ({
                       </button>
                     </div>
                     
-                    <span className="item-price">₹{item.price * item.quantity}</span>
+                    <span className="item-price" style={{ fontWeight: '700', color: 'var(--sage)' }}>
+                      ₹{item.price * item.quantity}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -135,14 +138,14 @@ const CartPage = ({
           <div className="summary-card">
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>₹{subtotal}</span>
+              <span>₹{subtotal.toFixed(2)}</span>
             </div>
             <div className="summary-row">
               <span>GST (5%)</span>
               <span>₹{tax.toFixed(2)}</span>
             </div>
             <div className="summary-row">
-              <span>Service Charge</span>
+              <span>Service Charge (2%)</span>
               <span>₹{serviceCharge.toFixed(2)}</span>
             </div>
             <div className="summary-row total">

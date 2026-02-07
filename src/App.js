@@ -10,9 +10,15 @@ import OrderTrackingPage from './pages/OrderTrackingPage';
 import UpiPaymentPage from './pages/UpiPaymentPage';
 import TableScanner from './pages/TableScanner';
 import LoginModal from './components/LoginModal';
-import AdminRedirect from './pages/AdminRedirect';
-import AdminAccess from './components/AdminAccess';
+import ProtectedRoute from './components/ProtectedRoute';
+import './index.css';
 import './App.css';
+
+// Demo users (customer only in main app)
+const demoCustomers = [
+  { email: 'student@college.com', password: 'password123', name: 'Student User', phone: '9876543210', role: 'customer' },
+  { email: 'john@example.com', password: 'password123', name: 'John Doe', phone: '9876543211', role: 'customer' }
+];
 
 function App() {
   const [user, setUser] = useState(null);
@@ -51,14 +57,14 @@ function App() {
     localStorage.setItem('queueless_cart', JSON.stringify(cart));
   }, [cart]);
 
-  // User functions
-  const handleLogin = (userData) => {
+  // Customer authentication functions
+  const handleCustomerLogin = (userData) => {
     setUser(userData);
     toast.success('Login successful!');
     setShowLoginModal(false);
   };
 
-  const handleSignup = (userData) => {
+  const handleCustomerSignup = (userData) => {
     setUser(userData);
     toast.success('Account created successfully!');
     setShowLoginModal(false);
@@ -87,6 +93,11 @@ function App() {
     if (!user) {
       toast.error('Please login to add items');
       setShowLoginModal(true);
+      return false;
+    }
+    
+    if (user.role !== 'customer') {
+      toast.error('Only customers can order');
       return false;
     }
     
@@ -195,12 +206,24 @@ function App() {
     return orders.find(order => order.id === orderId) || null;
   };
 
-  // Protected route
-  const ProtectedRoute = ({ children }) => {
-    if (!user || !tableNumber) {
-      return <Navigate to="/" replace />;
-    }
-    return children;
+  // Admin redirect handler
+  const handleAdminRedirect = () => {
+    // Redirect to static admin login page
+    window.location.href = '/admin/admin-login.html';
+    return null;
+  };
+
+  // Kitchen redirect handler
+  const handleKitchenRedirect = () => {
+    // Redirect to static kitchen page
+    window.location.href = '/admin/kitchen-dashboard.html';
+    return null;
+  };
+
+  // Admin dashboard redirect handler
+  const handleAdminDashboardRedirect = () => {
+    window.location.href = '/admin/admin-dashboard.html';
+    return null;
   };
 
   return (
@@ -219,6 +242,7 @@ function App() {
         />
         
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={
             <>
               <Header 
@@ -235,12 +259,29 @@ function App() {
                 onShowLogin={() => setShowLoginModal(true)}
                 onTableScan={handleTableScan}
               />
-              <BottomNav activeOrdersCount={activeOrders.length} />
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
             </>
           } />
           
+          <Route path="/scan" element={
+            <>
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)} 
+              />
+              <TableScanner 
+                onScanComplete={handleTableScan}
+                user={user}
+              />
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+            </>
+          } />
+          
+          {/* Customer Protected Routes */}
           <Route path="/menu" element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
               <Header 
                 user={user} 
                 tableNumber={tableNumber} 
@@ -253,12 +294,12 @@ function App() {
                 updateQuantity={updateQuantity}
                 user={user}
               />
-              <BottomNav activeOrdersCount={activeOrders.length} />
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
             </ProtectedRoute>
           } />
           
           <Route path="/cart" element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
               <Header 
                 user={user} 
                 tableNumber={tableNumber} 
@@ -274,12 +315,12 @@ function App() {
                 user={user}
                 tableNumber={tableNumber}
               />
-              <BottomNav activeOrdersCount={activeOrders.length} />
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
             </ProtectedRoute>
           } />
           
           <Route path="/orders" element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
               <Header 
                 user={user} 
                 tableNumber={tableNumber} 
@@ -292,12 +333,12 @@ function App() {
                 user={user}
                 tableNumber={tableNumber}
               />
-              <BottomNav activeOrdersCount={activeOrders.length} />
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
             </ProtectedRoute>
           } />
           
           <Route path="/payment/upi" element={
-            <ProtectedRoute>
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
               <UpiPaymentPage 
                 cart={cart}
                 placeOrder={placeOrder}
@@ -307,41 +348,58 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/scan" element={
-            <>
-              <Header 
-                user={user} 
-                tableNumber={tableNumber} 
-                cartCount={cart.length} 
-                onShowLogin={() => setShowLoginModal(true)} 
-              />
-              <TableScanner 
-                onScanComplete={handleTableScan}
-                user={user}
-              />
-              <BottomNav activeOrdersCount={activeOrders.length} />
-            </>
-          } />
-          
-          {/* Admin Route */}
-          <Route path="/admin" element={<AdminRedirect />} />
+          {/* Admin Routes - Redirect to Static HTML */}
+          <Route path="/admin" element={<Navigate to="/admin/admin-login.html" replace />} />
+          <Route path="/admin/login" element={handleAdminRedirect()} />
+          <Route path="/admin/dashboard" element={handleAdminDashboardRedirect()} />
+          <Route path="/kitchen" element={handleKitchenRedirect()} />
+          <Route path="/kitchen/dashboard" element={handleKitchenRedirect()} />
           
           {/* Catch all route - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
+        {/* Customer Login Modal */}
         {showLoginModal && (
           <LoginModal
             onClose={() => setShowLoginModal(false)}
-            onLogin={handleLogin}
-            onSignup={handleSignup}
+            onLogin={handleCustomerLogin}
+            onSignup={handleCustomerSignup}
             onLogout={handleLogout}
             user={user}
+            demoCustomers={demoCustomers}
           />
         )}
 
-        {/* Admin Access Button (hidden in corner) */}
-        <AdminAccess />
+        {/* Hidden Admin Access Link */}
+        {!user && (
+          <div style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 1000
+          }}>
+            <a 
+              href="/admin/admin-login.html"
+              style={{
+                background: 'var(--primary)',
+                color: 'white',
+                padding: '10px 15px',
+                borderRadius: 'var(--border-radius)',
+                textDecoration: 'none',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: 'var(--shadow-lg)'
+              }}
+            >
+              <i className="fas fa-user-shield"></i>
+              Staff Login
+            </a>
+          </div>
+        )}
       </div>
     </Router>
   );

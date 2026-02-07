@@ -97,10 +97,16 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
 
   const handleGetStarted = () => {
     if (user) {
-      if (tableNumber) {
-        navigate('/menu');
-      } else {
-        setShowTableModal(true);
+      if (user.role === 'customer') {
+        if (tableNumber) {
+          navigate('/menu');
+        } else {
+          setShowTableModal(true);
+        }
+      } else if (user.role === 'admin') {
+        navigate('/admin');
+      } else if (user.role === 'kitchen') {
+        navigate('/kitchen');
       }
     } else {
       onShowLogin();
@@ -208,7 +214,10 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
                   className="btn btn-primary"
                   style={{ fontSize: '1.1rem', padding: '0.75rem 2rem' }}
                 >
-                  {!user ? 'Login to Order' : !tableNumber ? 'Scan Table' : 'Browse Menu'}
+                  {!user ? 'Login to Order' : 
+                   user.role === 'admin' ? 'Go to Admin Panel' :
+                   user.role === 'kitchen' ? 'Go to Kitchen' :
+                   !tableNumber ? 'Scan Table' : 'Browse Menu'}
                 </button>
               </div>
             </div>
@@ -582,7 +591,7 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
               height: '60px',
               borderRadius: '50%',
               background: 'var(--gray-100)',
-              display: flex,
+              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 1rem',
@@ -675,43 +684,8 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
         </div>
       </div>
 
-      {/* Quick Features */}
-      <section className="features-section">
-        <h2 className="section-title">Why Choose Queueless?</h2>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-bolt"></i>
-            </div>
-            <h3>Fast Service</h3>
-            <p>Under 10-minute average waiting time</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-rupee-sign"></i>
-            </div>
-            <h3>Student Budget</h3>
-            <p>Affordable prices for students</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-wifi"></i>
-            </div>
-            <h3>Free WiFi</h3>
-            <p>Study while you wait</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <i className="fas fa-clock"></i>
-            </div>
-            <h3>No Queues</h3>
-            <p>Order from your table, skip the line</p>
-          </div>
-        </div>
-      </section>
-
       {/* Status Section */}
-      {user && tableNumber && (
+      {user && tableNumber && user.role === 'customer' && (
         <div className="status-section" style={{ width: '100%' }}>
           <div className="card">
             <h3>Ready to Order!</h3>
@@ -730,38 +704,29 @@ const Home = ({ user, tableNumber, cartCount, activeOrdersCount, onShowLogin, on
         </div>
       )}
 
-      {/* College Social Media */}
-      <div className="social-cta" style={{
-        textAlign: 'center',
-        padding: '2rem',
-        background: 'var(--white)',
-        borderRadius: 'var(--border-radius-lg)',
-        marginTop: '2rem',
-        boxShadow: 'var(--shadow)'
-      }}>
-        <h4 style={{ 
-          fontFamily: 'var(--font-serif)',
-          fontSize: '1.5rem',
-          marginBottom: '1rem',
-          color: 'var(--charcoal)'
-        }}>
-          Campus Updates
-        </h4>
-        <p style={{ color: 'var(--charcoal-light)', marginBottom: '1.5rem' }}>
-          Follow for daily specials, exam week deals, and campus events
-        </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
-            <i className="fab fa-instagram"></i>
-          </button>
-          <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
-            <i className="fab fa-whatsapp"></i>
-          </button>
-          <button className="btn btn-icon" style={{ background: 'var(--gray-100)', color: 'var(--primary)' }}>
-            <i className="fas fa-envelope"></i>
-          </button>
+      {/* Admin/Kichen Status Section */}
+      {(user?.role === 'admin' || user?.role === 'kitchen') && (
+        <div className="status-section" style={{ width: '100%' }}>
+          <div className="card">
+            <h3>Staff Dashboard Access</h3>
+            <p>You're logged in as {user.role.toUpperCase()}</p>
+            <div className="status-actions">
+              <button 
+                onClick={() => navigate(user.role === 'admin' ? '/admin' : '/kitchen')} 
+                className="btn btn-primary"
+              >
+                Go to Dashboard
+              </button>
+              <button 
+                onClick={() => navigate('/')} 
+                className="btn btn-secondary"
+              >
+                View Customer Site
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Manual Table Modal */}
       {showTableModal && (

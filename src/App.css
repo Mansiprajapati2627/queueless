@@ -1,3 +1,5 @@
+/* App.css - Component-specific styles */
+
 /* Modern Café Menu Page Styles */
 .menu-container {
   padding: 2rem 0;
@@ -628,6 +630,96 @@
   border: 1px solid var(--border);
   width: 100%;
 }
+/* Admin Dashboard Styles */
+.admin-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  background: var(--white);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-sidebar {
+  width: 250px;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  height: fit-content;
+}
+
+.admin-content {
+  flex: 1;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+
+/* Kitchen Dashboard Styles */
+.kitchen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.kitchen-order-card {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border-left: 4px solid;
+  transition: transform 0.3s ease;
+}
+
+.kitchen-order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Status Colors */
+.status-pending { color: #ff9800; background: #ff980020; }
+.status-preparing { color: #4CAF50; background: #4CAF5020; }
+.status-ready { color: #8BC34A; background: #8BC34A20; }
+.status-served { color: #673ab7; background: #673ab720; }
+.status-completed { color: #9e9e9e; background: #9e9e9e20; }
+
+/* Quick Actions */
+.quick-actions {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 1rem;
+  z-index: 1000;
+}
+
+/* Responsive Admin */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1rem;
+  }
+  
+  .admin-sidebar {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .kitchen-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-actions {
+    bottom: 1rem;
+    right: 1rem;
+    flex-direction: column;
+  }
+}
 
 /* Table Scanner */
 .scanner-container {
@@ -748,28 +840,4 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-}
-
-/* Add beautiful loading spinner */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: var(--white);
-  animation: spin 1s ease-in-out infinite;
-}
-
-.btn-primary .loading-spinner {
-  border-top-color: var(--white);
-}
-
-.btn-secondary .loading-spinner {
-  border-top-color: var(--sage);
 }
