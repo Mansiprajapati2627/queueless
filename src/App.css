@@ -1,4 +1,4 @@
-/* App.css - Component-specific styles */
+/* App.css - Complete Styles for Food Ordering App */
 
 /* Modern Café Menu Page Styles */
 .menu-container {
@@ -630,6 +630,7 @@
   border: 1px solid var(--border);
   width: 100%;
 }
+
 /* Admin Dashboard Styles */
 .admin-container {
   padding: 2rem;
@@ -699,28 +700,6 @@
   z-index: 1000;
 }
 
-/* Responsive Admin */
-@media (max-width: 768px) {
-  .admin-container {
-    padding: 1rem;
-  }
-  
-  .admin-sidebar {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  .kitchen-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .quick-actions {
-    bottom: 1rem;
-    right: 1rem;
-    flex-direction: column;
-  }
-}
-
 /* Table Scanner */
 .scanner-container {
   padding: 2rem;
@@ -761,7 +740,59 @@
   width: 100%;
 }
 
-/* Responsive */
+/* Fix for flickering */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Redirect screen styling */
+.redirect-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: var(--dark);
+  background: var(--light);
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 80px; /* Space for bottom nav */
+}
+
+/* Loading screen */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--light);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Styles */
 @media (max-width: 480px) {
   .menu-grid {
     grid-template-columns: 1fr;
@@ -787,6 +818,27 @@
   .cart-items-section,
   .order-summary-section {
     padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1rem;
+  }
+  
+  .admin-sidebar {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .kitchen-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-actions {
+    bottom: 1rem;
+    right: 1rem;
+    flex-direction: column;
   }
 }
 
@@ -839,60 +891,5 @@
   .orders-container {
     max-width: 1200px;
     margin: 0 auto;
-  }
-}
-/* Add ONLY these lines to your existing App.css */
-
-/* Add these styles to your App.css file */
-
-/* Fix for flickering */
-.app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.main-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Redirect screen styling */
-.redirect-screen {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-size: 1.2rem;
-  color: var(--dark);
-  background: var(--light);
-}
-
-/* Loading screen */
-.loading-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: var(--light);
-}
-
-.loading-spinner {
-  width: 60px;
-  height: 60px;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top-color: var(--primary);
-  animation: spin 1s ease-in-out infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
   }
 }

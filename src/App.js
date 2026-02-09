@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import Header from './components/Header';
@@ -20,7 +20,7 @@ const demoCustomers = [
   { email: 'john@example.com', password: 'password123', name: 'John Doe', phone: '9876543211', role: 'customer' }
 ];
 
-// Create redirect components (FIX FOR FLICKERING)
+// Create redirect components
 const AdminRedirect = () => {
   useEffect(() => {
     window.location.href = '/admin/admin-login.html';
@@ -60,95 +60,36 @@ function App() {
   const [cart, setCart] = useState([]);
   const [activeOrders, setActiveOrders] = useState([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Load all data from localStorage in a single effect
+  // Load data from localStorage
   useEffect(() => {
-    const loadData = () => {
-      try {
-        const savedUser = localStorage.getItem('queueless_user');
-        const savedTable = localStorage.getItem('queueless_table');
-        const savedCart = localStorage.getItem('queueless_cart');
-        const savedOrders = localStorage.getItem('queueless_orders');
+    const savedUser = localStorage.getItem('queueless_user');
+    const savedTable = localStorage.getItem('queueless_table');
+    const savedCart = localStorage.getItem('queueless_cart');
+    const savedOrders = localStorage.getItem('queueless_orders');
 
-        if (savedUser) setUser(JSON.parse(savedUser));
-        if (savedTable) setTableNumber(savedTable);
-        if (savedCart) setCart(JSON.parse(savedCart));
-        if (savedOrders) {
-          const orders = JSON.parse(savedOrders);
-          const active = orders.filter(order => order.status !== 'completed');
-          setActiveOrders(active);
-        }
-      } catch (error) {
-        console.error('Error loading data from localStorage:', error);
-        // Clear corrupted data
-        localStorage.removeItem('queueless_user');
-        localStorage.removeItem('queueless_table');
-        localStorage.removeItem('queueless_cart');
-        localStorage.removeItem('queueless_orders');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
+    if (savedUser) setUser(JSON.parse(savedUser));
+    if (savedTable) setTableNumber(savedTable);
+    if (savedCart) setCart(JSON.parse(savedCart));
+    if (savedOrders) {
+      const orders = JSON.parse(savedOrders);
+      const active = orders.filter(order => order.status !== 'completed');
+      setActiveOrders(active);
+    }
   }, []);
 
-  // Save all data when any relevant state changes
+  // Save data when it changes
   useEffect(() => {
-    if (!isLoading) {
-      const saveData = () => {
-        try {
-          if (user) {
-            localStorage.setItem('queueless_user', JSON.stringify(user));
-          } else {
-            localStorage.removeItem('queueless_user');
-          }
-          
-          if (tableNumber) {
-            localStorage.setItem('queueless_table', tableNumber);
-          } else {
-            localStorage.removeItem('queueless_table');
-          }
-          
-          localStorage.setItem('queueless_cart', JSON.stringify(cart));
-        } catch (error) {
-          console.error('Error saving data to localStorage:', error);
-        }
-      };
+    if (user) localStorage.setItem('queueless_user', JSON.stringify(user));
+  }, [user]);
 
-      // Use setTimeout to batch updates
-      const timer = setTimeout(saveData, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [user, tableNumber, cart, isLoading]);
-
-  // Save orders separately when they change
   useEffect(() => {
-    if (!isLoading) {
-      const saveOrders = () => {
-        try {
-          // Load existing orders first
-          const savedOrders = localStorage.getItem('queueless_orders');
-          const existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
-          
-          // Filter out completed orders from activeOrders and merge with existing
-          const completedOrders = existingOrders.filter(order => order.status === 'completed');
-          const allOrders = [...activeOrders, ...completedOrders];
-          
-          // Save only if there are changes
-          if (JSON.stringify(allOrders) !== JSON.stringify(existingOrders)) {
-            localStorage.setItem('queueless_orders', JSON.stringify(allOrders));
-          }
-        } catch (error) {
-          console.error('Error saving orders to localStorage:', error);
-        }
-      };
+    if (tableNumber) localStorage.setItem('queueless_table', tableNumber);
+  }, [tableNumber]);
 
-      const timer = setTimeout(saveOrders, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [activeOrders, isLoading]);
+  useEffect(() => {
+    localStorage.setItem('queueless_cart', JSON.stringify(cart));
+  }, [cart]);
 
   // Customer authentication functions
   const handleCustomerLogin = useCallback((userData) => {
@@ -203,23 +144,21 @@ function App() {
       return false;
     }
 
-    setCart(prevCart => {
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
-      
-      if (existingItem) {
-        return prevCart.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + quantity }
-            : cartItem
-        );
-      } else {
-        return [...prevCart, { ...item, quantity }];
-      }
-    });
+    const existingItem = cart.find(cartItem => cartItem.id === item.id);
+    
+    if (existingItem) {
+      setCart(cart.map(cartItem =>
+        cartItem.id === item.id
+          ? { ...cartItem, quantity: cartItem.quantity + quantity }
+          : cartItem
+      ));
+    } else {
+      setCart([...cart, { ...item, quantity }]);
+    }
 
     toast.success(`${item.name} added to cart!`);
     return true;
-  }, [user, tableNumber]);
+  }, [user, tableNumber, cart]);
 
   const updateQuantity = useCallback((itemId, change) => {
     setCart(prevCart => {
@@ -235,9 +174,9 @@ function App() {
   }, []);
 
   const removeFromCart = useCallback((itemId) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== itemId));
+    setCart(cart.filter(item => item.id !== itemId));
     toast.success('Item removed from cart');
-  }, []);
+  }, [cart]);
 
   const clearCart = useCallback(() => {
     setCart([]);
@@ -299,7 +238,7 @@ function App() {
     const activeOrder = activeOrders.find(order => order.id === orderId);
     if (activeOrder) return activeOrder;
     
-    // Check localStorage for completed orders
+    // Check localStorage
     try {
       const savedOrders = localStorage.getItem('queueless_orders');
       if (!savedOrders) return null;
@@ -310,30 +249,6 @@ function App() {
       return null;
     }
   }, [activeOrders]);
-
-  // Memoize props that are passed to child components
-  const headerProps = useMemo(() => ({
-    user,
-    tableNumber,
-    cartCount: cart.length,
-    onShowLogin: () => setShowLoginModal(true),
-    onLogout: handleLogout
-  }), [user, tableNumber, cart.length, handleLogout]);
-
-  const bottomNavProps = useMemo(() => ({
-    activeOrdersCount: activeOrders.length,
-    user
-  }), [activeOrders.length, user]);
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <div className="loading-spinner"></div>
-        <p>Loading Queueless...</p>
-      </div>
-    );
-  }
 
   return (
     <Router>
@@ -350,13 +265,17 @@ function App() {
           }}
         />
         
-        {/* Always render Header and BottomNav to prevent remounting */}
-        <Header {...headerProps} />
-        
-        <main className="main-content">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={
+        <Routes>
+          {/* Home Route */}
+          <Route path="/" element={
+            <>
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)}
+                onLogout={handleLogout}
+              />
               <Home 
                 user={user}
                 tableNumber={tableNumber}
@@ -365,18 +284,39 @@ function App() {
                 onShowLogin={() => setShowLoginModal(true)}
                 onTableScan={handleTableScan}
               />
-            } />
-            
-            <Route path="/scan" element={
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+            </>
+          } />
+          
+          {/* Scan Route */}
+          <Route path="/scan" element={
+            <>
+              <Header 
+                user={user} 
+                tableNumber={tableNumber} 
+                cartCount={cart.length} 
+                onShowLogin={() => setShowLoginModal(true)}
+                onLogout={handleLogout}
+              />
               <TableScanner 
                 onScanComplete={handleTableScan}
                 user={user}
               />
-            } />
-            
-            {/* Customer Protected Routes */}
-            <Route path="/menu" element={
-              <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+              <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+            </>
+          } />
+          
+          {/* Menu Route */}
+          <Route path="/menu" element={
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+              <>
+                <Header 
+                  user={user} 
+                  tableNumber={tableNumber} 
+                  cartCount={cart.length} 
+                  onShowLogin={() => setShowLoginModal(true)}
+                  onLogout={handleLogout}
+                />
                 <MenuPage 
                   cart={cart}
                   addToCart={addToCart}
@@ -384,11 +324,22 @@ function App() {
                   user={user}
                   tableNumber={tableNumber}
                 />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/cart" element={
-              <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+                <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+              </>
+            </ProtectedRoute>
+          } />
+          
+          {/* Cart Route */}
+          <Route path="/cart" element={
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+              <>
+                <Header 
+                  user={user} 
+                  tableNumber={tableNumber} 
+                  cartCount={cart.length} 
+                  onShowLogin={() => setShowLoginModal(true)}
+                  onLogout={handleLogout}
+                />
                 <CartPage 
                   cart={cart}
                   updateQuantity={updateQuantity}
@@ -398,46 +349,67 @@ function App() {
                   user={user}
                   tableNumber={tableNumber}
                 />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/orders" element={
-              <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+                <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+              </>
+            </ProtectedRoute>
+          } />
+          
+          {/* Orders Route */}
+          <Route path="/orders" element={
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+              <>
+                <Header 
+                  user={user} 
+                  tableNumber={tableNumber} 
+                  cartCount={cart.length} 
+                  onShowLogin={() => setShowLoginModal(true)}
+                  onLogout={handleLogout}
+                />
                 <OrderTrackingPage 
                   activeOrders={activeOrders}
                   getOrderById={getOrderById}
                   user={user}
                   tableNumber={tableNumber}
                 />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/payment/upi" element={
-              <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+                <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+              </>
+            </ProtectedRoute>
+          } />
+          
+          {/* UPI Payment Route */}
+          <Route path="/payment/upi" element={
+            <ProtectedRoute user={user} allowedRoles={['customer']} requireTable={true}>
+              <>
+                <Header 
+                  user={user} 
+                  tableNumber={tableNumber} 
+                  cartCount={cart.length} 
+                  onShowLogin={() => setShowLoginModal(true)}
+                  onLogout={handleLogout}
+                />
                 <UpiPaymentPage 
                   cart={cart}
                   placeOrder={placeOrder}
                   user={user}
                   tableNumber={tableNumber}
                 />
-              </ProtectedRoute>
-            } />
-            
-            {/* Admin Routes - FIXED: Use components instead of function calls */}
-            <Route path="/admin" element={<Navigate to="/admin/admin-login.html" replace />} />
-            <Route path="/admin/login" element={<AdminRedirect />} />
-            <Route path="/admin/dashboard" element={<AdminDashboardRedirect />} />
-            <Route path="/kitchen" element={<KitchenRedirect />} />
-            <Route path="/kitchen/dashboard" element={<KitchenRedirect />} />
-            
-            {/* Catch all route - redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-        
-        <BottomNav {...bottomNavProps} />
+                <BottomNav activeOrdersCount={activeOrders.length} user={user} />
+              </>
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<Navigate to="/admin/admin-login.html" replace />} />
+          <Route path="/admin/login" element={<AdminRedirect />} />
+          <Route path="/admin/dashboard" element={<AdminDashboardRedirect />} />
+          <Route path="/kitchen" element={<KitchenRedirect />} />
+          <Route path="/kitchen/dashboard" element={<KitchenRedirect />} />
+          
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
 
-        {/* Customer Login Modal */}
+        {/* Login Modal */}
         {showLoginModal && (
           <LoginModal
             onClose={() => setShowLoginModal(false)}
@@ -449,7 +421,7 @@ function App() {
           />
         )}
 
-        {/* Hidden Admin Access Link */}
+        {/* Admin Access Link */}
         {!user && (
           <div className="admin-access-link">
             <a 
