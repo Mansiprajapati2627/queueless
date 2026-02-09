@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ user, allowedRoles, requireTable = false, children }) => {
+const ProtectedRoute = ({ children, user, allowedRoles, requireTable = false }) => {
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -10,7 +10,7 @@ const ProtectedRoute = ({ user, allowedRoles, requireTable = false, children }) 
     return <Navigate to="/" replace />;
   }
 
-  if (requireTable && user.role === 'customer' && !user.tableNumber) {
+  if (requireTable && !user.tableNumber) {
     return <Navigate to="/scan" replace />;
   }
 
