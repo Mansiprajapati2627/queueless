@@ -1,45 +1,34 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useMemo } from 'react';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
-};
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null); // null or { email, role }
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('queueless_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+  const login = (email, password) => {
+    // Mock authentication
+    if (email === 'admin@queueless.com' && password === 'admin123') {
+      setUser({ email, role: 'admin' });
+      return true;
+    } else if (email && password) {
+      // any non-admin credentials become customer
+      setUser({ email, role: 'customer' });
+      return true;
     }
-    setLoading(false);
-  }, []);
-
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('queueless_user', JSON.stringify(userData));
+    return false;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('queueless_user');
-  };
+  const logout = () => setUser(null);
 
-  const value = {
+  const value = useMemo(() => ({
     user,
-    loading,
-    login,
-    logout,
-    isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
-    isKitchen: user?.role === 'kitchen',
-    isCustomer: user?.role === 'customer'
-  };
+    isCustomer: user?.role === 'customer' || !user, // customer can be null too
+    login,
+    logout
+  }), [user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export const useAuthContext = () => useContext(AuthContext);
