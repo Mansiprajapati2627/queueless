@@ -10,4 +10,4 @@ const ScanPage = () => {
   );
 };
 
-export default ScanPage;  // must be default export
+export default ScanPage;

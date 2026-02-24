@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
+
+  // Auto‑redirect when user is set
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/profile');
+      }
+    }
+  }, [user, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
     const success = login(email, password);
-    if (success) {
-      if (email === 'admin@queueless.com' && password === 'admin123') {
-        navigate('/admin');
-      } else {
-        navigate('/profile');
-      }
-    } else {
+    if (!success) {
       setError('Invalid credentials');
     }
   };

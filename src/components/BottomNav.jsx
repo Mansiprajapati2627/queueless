@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Menu, QrCode, Package } from 'lucide-react';
+import { Home, Menu, QrCode, Package, User } from 'lucide-react';
 
 const BottomNav = () => {
   const navItems = [
@@ -8,6 +8,7 @@ const BottomNav = () => {
     { to: '/menu', icon: Menu, label: 'Menu' },
     { to: '/', icon: QrCode, label: 'Scan' },
     { to: '/tracking', icon: Package, label: 'Orders' },
+    { to: '/profile', icon: User, label: 'Profile' },
   ];
 
   return (
@@ -26,4 +27,4 @@ const BottomNav = () => {
   );
 };
 
-export default BottomNav;   // <-- this must be present
+export default BottomNav;

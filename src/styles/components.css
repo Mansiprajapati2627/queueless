@@ -320,3 +320,66 @@
   flex: 1;
   padding: 2rem;
 }
+/* Top Bar */
+.top-bar {
+  background: white;
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--shadow);
+}
+
+.top-bar .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  letter-spacing: -0.02em;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-email {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.login-btn,
+.logout-btn {
+  background: var(--accent-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn:hover,
+.logout-btn:hover {
+  background: var(--accent-secondary);
+  transform: scale(1.05);
+}
+
+/* Adjust main content to account for fixed top bar if needed */
+.main-content {
+  padding: 2rem 1rem 5rem; /* bottom padding for bottom nav */
+  max-width: 1200px;
+  margin: 0 auto;
+}

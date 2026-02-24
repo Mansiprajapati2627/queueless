@@ -22,7 +22,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
 
       {/* User routes with bottom navigation */}
-     <Route path="/" element={<div>User Layout Placeholder</div>}>
+     <Route path="/" element={<UserLayout />}>
         <Route index element={<ScanPage />} />
         <Route path="home" element={<HomePage />} />
         <Route path="menu" element={<MenuPage />} />
