@@ -1,21 +1,36 @@
-/* Scan Page */
+/* ===== Scan Page ===== */
 .scan-page {
   padding: 2rem 1rem;
   text-align: center;
 }
 
-/* Home Page */
+.scan-page h1 {
+  color: var(--accent-secondary);
+  margin-bottom: 1rem;
+}
+
+/* ===== Home Page ===== */
 .home-page {
   padding: 2rem 1rem;
 }
 
 .hero {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%);
   color: white;
   padding: 3rem 2rem;
   border-radius: var(--radius);
   margin-bottom: 2rem;
   text-align: center;
+}
+
+.hero h1 {
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
 }
 
 .table-badge {
@@ -25,42 +40,70 @@
   border-radius: 2rem;
   display: inline-block;
   margin-top: 1rem;
+  font-weight: 600;
 }
 
 .specials {
   margin-bottom: 2rem;
 }
 
+.specials h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1rem;
+}
+
 .special-card {
-  background: white;
+  background: var(--card-bg);
   padding: 1.5rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin-top: 1rem;
 }
 
+.special-card h3 {
+  color: var(--accent-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.special-card p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.special-card a {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
 .quick-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
-.action-btn {
-  background: var(--accent-primary);
+.quick-actions .action-btn {
+  background: var(--button-bg);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius);
   transition: var(--transition);
+  font-weight: 600;
 }
 
-.action-btn:hover {
+.quick-actions .action-btn:hover {
   background: var(--accent-secondary);
   transform: scale(1.05);
 }
 
-/* Menu Page */
+/* ===== Menu Page ===== */
 .menu-page {
   padding: 2rem 1rem 5rem;
+}
+
+.menu-page h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1rem;
 }
 
 .menu-grid {
@@ -70,28 +113,63 @@
   margin-top: 2rem;
 }
 
-/* Cart Page */
+/* ===== Cart Page ===== */
 .cart-page {
   padding: 2rem 1rem 5rem;
 }
 
+.cart-page h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1.5rem;
+}
+
 .cart-items {
   margin: 1.5rem 0;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
 .cart-summary {
   text-align: right;
   font-size: 1.2rem;
   padding: 1rem 0;
+  color: var(--accent-secondary);
+  font-weight: 700;
 }
 
-/* Order Tracking Page */
+.cart-page.empty {
+  text-align: center;
+}
+
+.cart-page.empty p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.cart-page.empty a {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* ===== Order Tracking Page ===== */
 .tracking-page {
   padding: 2rem 1rem 5rem;
 }
 
+.tracking-page h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.tracking-page h3 {
+  color: var(--accent-secondary);
+  margin: 2rem 0 1rem;
+}
+
 .order-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 1rem;
@@ -105,15 +183,55 @@
   margin-bottom: 0.5rem;
 }
 
+.order-header span {
+  font-weight: 600;
+  color: var(--accent-secondary);
+}
+
+.order-card ul {
+  list-style: none;
+  margin: 0.5rem 0;
+}
+
+.order-card li {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.order-total {
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
 .order-card.past {
   opacity: 0.7;
 }
 
-/* Profile Page */
+/* ===== Profile Page ===== */
 .profile-page {
   padding: 2rem 1rem 5rem;
   max-width: 400px;
   margin: 0 auto;
+  text-align: center;
+}
+
+.profile-page h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.profile-page p {
+  margin: 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.profile-page .error {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 0.5rem;
+  border-radius: var(--radius);
 }
 
 .profile-page form {
@@ -121,75 +239,41 @@
   flex-direction: column;
   gap: 1rem;
   margin: 1.5rem 0;
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .profile-page input {
   padding: 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
+  font-family: inherit;
 }
 
 .profile-page button {
   padding: 0.75rem;
-  background: var(--accent-primary);
+  background: var(--button-bg);
   color: white;
   border-radius: var(--radius);
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
 }
 
-/* Admin Pages */
-.admin-dashboard .stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+.profile-page button:hover {
+  background: var(--accent-secondary);
 }
 
-.stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-align: center;
+.profile-page a {
+  color: var(--accent-primary);
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 1rem;
 }
 
-.admin-orders table,
-.admin-customers table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 2rem;
-  background: white;
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.admin-orders th,
-.admin-orders td,
-.admin-customers th,
-.admin-customers td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.admin-orders select {
-  padding: 0.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius);
-}
-
-.admin-analytics .chart-container {
-  background: white;
-  padding: 2rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  margin: 2rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Login Page */
+/* ===== Login Page ===== */
 .login-page {
   min-height: 100vh;
   display: flex;
@@ -197,10 +281,24 @@
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  background: var(--bg-primary);
+}
+
+.login-page h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.login-page .error {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
 }
 
 .login-page form {
-  background: white;
+  background: var(--card-bg);
   padding: 2rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -215,11 +313,112 @@
   padding: 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
+  font-family: inherit;
 }
 
 .login-page button {
   padding: 0.75rem;
-  background: var(--accent-primary);
+  background: var(--button-bg);
   color: white;
   border-radius: var(--radius);
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.login-page button:hover {
+  background: var(--accent-secondary);
+}
+
+/* ===== Admin Pages ===== */
+.admin-dashboard h1,
+.admin-customers h1,
+.admin-orders h1,
+.admin-analytics h1 {
+  color: var(--accent-secondary);
+  margin-bottom: 2rem;
+}
+
+.admin-dashboard .stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.stat-card h3 {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.admin-orders table,
+.admin-customers table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.admin-orders th,
+.admin-orders td,
+.admin-customers th,
+.admin-customers td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-orders th,
+.admin-customers th {
+  background: var(--bg-primary);
+  color: var(--accent-secondary);
+  font-weight: 600;
+}
+
+.admin-orders tr:hover,
+.admin-customers tr:hover {
+  background: var(--bg-primary);
+}
+
+.admin-orders select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-family: inherit;
+  background: white;
+}
+
+.admin-analytics .chart-container {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-analytics .chart-container h2 {
+  color: var(--accent-secondary);
+  margin-bottom: 1.5rem;
 }

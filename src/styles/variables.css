@@ -1,10 +1,12 @@
 :root {
-  --bg-primary: #FDF8F3;
-  --accent-primary: #A7BFA3;
-  --accent-secondary: #D8B7A9;
-  --text-primary: #333333;
-  --text-secondary: #5A5A5A;
-  --border-color: #E8E2DA;
+  --bg-primary: #F1F5F9;
+  --accent-primary: #2563EB;      /* Bright Blue – active states, prices */
+  --accent-secondary: #0B1F3A;    /* Midnight Blue – headers, hover states */
+  --button-bg: #1E40AF;           /* Dark Blue – primary buttons */
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --border-color: #E2E8F0;
+  --card-bg: #FFFFFF;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --radius: 0.5rem;
   --transition: all 0.3s ease;
