@@ -1,10 +1,10 @@
 import React, { createContext, useState, useContext, useMemo } from 'react';
-import { dummyOrders } from '../utils/dummyData';
+import { dummyOrders as initialOrders } from '../utils/dummyData';
 
 const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
-  const [orders, setOrders] = useState(dummyOrders); // initial dummy data
+  const [orders, setOrders] = useState(initialOrders);
 
   const createOrder = (orderDetails) => {
     const newOrder = {
@@ -21,10 +21,16 @@ export const OrderProvider = ({ children }) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
   };
 
+  const getUserOrders = (userEmail) => {
+    if (!userEmail) return [];
+    return orders.filter(order => order.userEmail === userEmail);
+  };
+
   const value = useMemo(() => ({
     orders,
     createOrder,
     updateOrderStatus,
+    getUserOrders,
   }), [orders]);
 
   return <OrderContext.Provider value={value}>{children}</OrderContext.Provider>;

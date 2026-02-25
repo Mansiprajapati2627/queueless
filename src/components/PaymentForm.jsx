@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { PAYMENT_METHODS } from '../utils/constants';
 import { useCart } from '../hooks/useCart';
 import { useOrders } from '../hooks/useOrders';
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { formatCurrency } from '../utils/helpers';
 
 const PaymentForm = () => {
   const { items, total, tableNumber, clearCart, setPaymentMethod } = useCart();
   const { createOrder } = useOrders();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedMethod, setSelectedMethod] = useState('');
 
@@ -21,6 +24,7 @@ const PaymentForm = () => {
       items: items.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
       total,
       status: 'pending',
+      userEmail: user?.email || null, // store user email if logged in
     };
     createOrder(order);
     clearCart();
