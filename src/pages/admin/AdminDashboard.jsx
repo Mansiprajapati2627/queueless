@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchOrders } from '../../services/orderService';
 import { dummyCustomers } from '../../utils/dummyData';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
 import { formatCurrency } from '../../utils/helpers';
 import { 
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { 
   TrendingUp, Users, ShoppingBag, Clock, 
-  Calendar, ChevronRight, Award, Star 
+  Calendar, ChevronRight, Award 
 } from 'lucide-react';
 
-// Dummy data for charts (in real app, this would come from API)
+// Dummy data for charts
 const generateRevenueData = () => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   return days.map(day => ({
@@ -46,6 +47,7 @@ const statusData = [
 ];
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [revenueData] = useState(generateRevenueData());
@@ -76,7 +78,7 @@ const AdminDashboard = () => {
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
   const totalCustomers = dummyCustomers.length;
 
-  const recentOrders = orders.slice(-5).reverse(); // last 5 orders
+  const recentOrders = orders.slice(-5).reverse();
 
   return (
     <div className="admin-dashboard">
@@ -95,42 +97,31 @@ const AdminDashboard = () => {
       {/* Key Metrics Cards */}
       <div className="metrics-grid">
         <div className="metric-card revenue">
-          <div className="metric-icon">
-            <TrendingUp size={24} />
-          </div>
+          <div className="metric-icon"><TrendingUp size={24} /></div>
           <div className="metric-content">
             <h3>Total Revenue</h3>
             <p className="metric-value">{formatCurrency(totalRevenue)}</p>
             <span className="metric-trend">+12.5% from last week</span>
           </div>
         </div>
-
         <div className="metric-card orders">
-          <div className="metric-icon">
-            <ShoppingBag size={24} />
-          </div>
+          <div className="metric-icon"><ShoppingBag size={24} /></div>
           <div className="metric-content">
             <h3>Today's Orders</h3>
             <p className="metric-value">{todayOrders}</p>
             <span className="metric-trend">{orders.length} total orders</span>
           </div>
         </div>
-
         <div className="metric-card pending">
-          <div className="metric-icon">
-            <Clock size={24} />
-          </div>
+          <div className="metric-icon"><Clock size={24} /></div>
           <div className="metric-content">
             <h3>Pending</h3>
             <p className="metric-value">{pendingOrders}</p>
             <span className="metric-trend">Need attention</span>
           </div>
         </div>
-
         <div className="metric-card customers">
-          <div className="metric-icon">
-            <Users size={24} />
-          </div>
+          <div className="metric-icon"><Users size={24} /></div>
           <div className="metric-content">
             <h3>Customers</h3>
             <p className="metric-value">{totalCustomers}</p>
@@ -157,7 +148,6 @@ const AdminDashboard = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-
         <div className="chart-card">
           <h3>Order Status Distribution</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -187,17 +177,13 @@ const AdminDashboard = () => {
         <div className="recent-orders-card">
           <div className="card-header">
             <h3>Recent Orders</h3>
-            <a href="/admin/orders" className="view-all">View All <ChevronRight size={16} /></a>
+            <a href="/admin/orders" className="view-all" onClick={(e) => { e.preventDefault(); navigate('/admin/orders'); }}>
+              View All <ChevronRight size={16} />
+            </a>
           </div>
           <table className="recent-orders-table">
             <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Table</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Status</th>
-              </tr>
+              <tr><th>Order ID</th><th>Table</th><th>Items</th><th>Total</th><th>Status</th></tr>
             </thead>
             <tbody>
               {recentOrders.map(order => (
@@ -212,7 +198,6 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
-
         <div className="top-items-card">
           <div className="card-header">
             <h3>Top Selling Items</h3>
@@ -227,7 +212,7 @@ const AdminDashboard = () => {
                   <span className="item-sales">{item.sales} sold</span>
                 </div>
                 <div className="progress-bar-container">
-                  <div className="progress-bar" style={{ width: `${item.percentage}%` }}></div>
+                  <div className="progress-bar" style={{ width: `${item.percentage}%` }} />
                 </div>
                 <span className="item-revenue">{formatCurrency(item.revenue)}</span>
               </div>
@@ -238,10 +223,10 @@ const AdminDashboard = () => {
 
       {/* Quick Actions */}
       <div className="quick-actions-grid">
-        <button className="quick-action-btn">Manage Menu</button>
-        <button className="quick-action-btn">View All Orders</button>
-        <button className="quick-action-btn">Customer List</button>
-        <button className="quick-action-btn">Analytics Report</button>
+        <button className="quick-action-btn" onClick={() => navigate('/admin/menu')}>Manage Menu</button>
+        <button className="quick-action-btn" onClick={() => navigate('/admin/orders')}>View All Orders</button>
+        <button className="quick-action-btn" onClick={() => navigate('/admin/customers')}>Customer List</button>
+        <button className="quick-action-btn" onClick={() => navigate('/admin/analytics')}>Analytics Report</button>
       </div>
     </div>
   );

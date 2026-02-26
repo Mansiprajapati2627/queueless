@@ -8,6 +8,7 @@ import CartPage from './pages/user/CartPage';
 import OrderTrackingPage from './pages/user/OrderTrackingPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminMenu from './pages/admin/AdminMenu';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
@@ -33,6 +34,7 @@ function App() {
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="menu" element={<AdminMenu />} />
       </Route>
 
       {/* Redirect any unknown routes to home */}
