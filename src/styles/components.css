@@ -648,3 +648,182 @@
   justify-content: center;
   padding: 0 4px;
 }
+/* ===== Enhanced Payment Form ===== */
+.payment-form {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.payment-method {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.payment-method.selected {
+  border-color: var(--accent-primary);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.payment-method input[type="radio"] {
+  display: none;
+}
+
+.method-icon {
+  color: var(--accent-secondary);
+}
+
+.method-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.upi-section,
+.card-section,
+.cash-section {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.qr-code img {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 1rem;
+}
+
+.qr-code p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.upi-id {
+  font-family: monospace;
+  font-size: 1rem;
+  color: var(--accent-secondary);
+  margin-top: 0.5rem;
+}
+
+.payment-summary {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.total-amount {
+  color: var(--accent-primary);
+}
+
+.pay-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--button-bg);
+  color: white;
+  font-size: 1.1rem;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: var(--accent-secondary);
+}
+
+.pay-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Order Timeline ===== */
+.order-timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0 1rem;
+  position: relative;
+}
+
+.order-timeline::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background: var(--border-color);
+  z-index: 1;
+}
+
+.timeline-step {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-step.completed .step-icon {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+.timeline-step.current .step-icon {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+}
+
+.step-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.timeline-step.completed .step-status {
+  color: var(--accent-primary);
+}
+
+.step-time {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}

@@ -1,31 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const { login, register } = useAuth();
-  const [mode, setMode] = useState('login'); // 'login' or 'signup'
+  const navigate = useNavigate();
+  const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  // Close modal on escape key
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.addEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
 
   const resetForm = () => {
     setEmail('');
@@ -35,14 +22,14 @@ const LoginModal = ({ isOpen, onClose }) => {
     setError('');
   };
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
   const handleClose = () => {
     resetForm();
     setMode('login');
     onClose();
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) handleClose();
   };
 
   const handleSubmit = (e) => {
@@ -52,16 +39,24 @@ const LoginModal = ({ isOpen, onClose }) => {
 
     setTimeout(() => {
       if (mode === 'login') {
-        const success = login(email, password);
+        const success = login(email.trim(), password.trim());
         if (success) {
+          // Redirect based on email immediately
+          if (email.trim().toLowerCase() === 'admin@queueless.com') {
+            navigate('/admin');
+          } else {
+            navigate('/profile');
+          }
           handleClose();
         } else {
           setError('Invalid email or password');
         }
       } else {
-        // Sign up
-        const result = register(name, email, password, phone);
+        // Signup mode
+        const result = register(name.trim(), email.trim(), password.trim(), phone.trim());
         if (result.success) {
+          // Auto-login after signup, redirect to profile
+          navigate('/profile');
           handleClose();
         } else {
           setError(result.error);

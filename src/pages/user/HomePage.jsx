@@ -24,7 +24,7 @@ const features = [
   { icon: TrendingUp, title: 'Fast Service', description: 'Quick order processing' },
 ];
 
-const popularItems = dummyMenu.filter((_, index) => index < 6); // first 6 items as popular
+const popularItems = dummyMenu.filter((_, index) => index < 6);
 
 const HomePage = () => {
   const { tableNumber } = useCart();
@@ -43,7 +43,7 @@ const HomePage = () => {
       <section className="hero">
         <h1>Welcome to QueueLess</h1>
         <p>Skip the line, enjoy your meal</p>
-        {tableNumber && <p className="table-badge">Table {tableNumber}</p>}
+        {tableNumber && <p className="table-badge">You are at Table {tableNumber}</p>}
       </section>
 
       {/* Image Slideshow */}

@@ -1,12 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Menu, QrCode, Package, User } from 'lucide-react';
+import { Home, Menu, Package, User } from 'lucide-react';
 
 const BottomNav = () => {
   const navItems = [
     { to: '/home', icon: Home, label: 'Home' },
     { to: '/menu', icon: Menu, label: 'Menu' },
-    { to: '/', icon: QrCode, label: 'Scan' },
     { to: '/tracking', icon: Package, label: 'Orders' },
     { to: '/profile', icon: User, label: 'Profile' },
   ];
