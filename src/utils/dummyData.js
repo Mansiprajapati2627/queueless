@@ -2,22 +2,22 @@
 const getImageForCategory = (category, index) => {
   const images = {
     Snacks: [
-      'https://images.unsplash.com/photo-1627662052152-6e5c3e3f0a2e?w=300', // spring rolls
-      'https://images.unsplash.com/photo-1541529086526-db283c563270?w=300', // nachos
-      'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300', // fries
+      'https://images.unsplash.com/photo-1695712641569-05eee7b37b6d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c3ByaW5nJTIwcm9sbHN8ZW58MHx8MHx8fDA%3D', // spring rolls
+      'https://images.unsplash.com/photo-1619604107557-b5321217aee7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8bmFjaG9zfGVufDB8fDB8fHww', // nachos
+      'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZnJpZXN8ZW58MHx8MHx8fDA%3D', // fries
       'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=300', // wings
     ],
     Meals: [
-      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300', // pizza
-      'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=300', // burger
-      'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300', // bowl
-      'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=300', // pasta
+      'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGl6emF8ZW58MHx8MHx8fDA%3D', // pizza
+      'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8YnVyZ2VyfGVufDB8fDB8fHww', // burger
+      'https://images.unsplash.com/photo-1567575990843-105a1c70d76e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGJvd2x8ZW58MHx8MHx8fDA%3D', // bowl
+      'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFzdGF8ZW58MHx8MHx8fDA%3D', // pasta
     ],
     Drinks: [
-      'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300', // latte
-      'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300', // juice
-      'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?w=300', // smoothie
-      'https://images.unsplash.com/photo-1543007631-283050bb3b8c?w=300', // mocktail
+      'https://images.unsplash.com/photo-1593443320739-77f74939d0da?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGF0dGV8ZW58MHx8MHx8fDA%3D', // latte
+      'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8anVpY2V8ZW58MHx8MHx8fDA%3D', // juice
+      'https://images.unsplash.com/photo-1600718374662-0483d2b9da44?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHNtb290aGllfGVufDB8fDB8fHww', // smoothie
+      'https://plus.unsplash.com/premium_photo-1671647122910-3fa8ab4990cb?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y29ja3RhaWx8ZW58MHx8MHx8fDA%3D', // mocktail
     ],
     Desserts: [
       'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300', // brownie
