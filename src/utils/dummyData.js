@@ -1,41 +1,39 @@
-// List of your local images
-const localImages = {
-  Snacks: [
-    '/assets/test.jpg',
-    '/assets/springrolll.jpg',
-    '/assets/samosa.jpg',
-    '/assets/nachos.jpg',
-    '/assets/frenchfries.jpg',
-  ],
-  Meals: [
-    '/public/assets/burger.jpg',
-    '/assets/pizza.jpg',  // pizza
-    '/assets/burger.jpg',
-    '/assets/piazza.jpg',
-  ],
-  Drinks: [
-    '/assets/frenchfries.jpg', // placeholder – replace with drink images later
-    '/assets/nachos.jpg',
-  ],
-  Desserts: [
-    '/assets/samosa.jpg',
-    '/assets/springroll.jpg',
-  ]
-};
-
-// Helper to get an image for a category, cycling through available ones
-const getImageForCategory = (category, index) => {
-  const images = localImages[category] || localImages['Snacks'];
-  return images[index % images.length];
-};
-
-// Helper to generate random INR price within a range
+// Helper for INR prices
 const randomPrice = (min, max) => {
   return Math.round((Math.random() * (max - min) + min) * 100) / 100;
 };
 
-// Generate 25 items per category
-const categories = ['Snacks', 'Meals', 'Drinks', 'Desserts'];
+// All image paths MUST start with a forward slash /
+const getImageForCategory = (category, index) => {
+  const imageMap = {
+    Snacks: [
+      '/assets/springroll.jpg',
+      '/assets/springroll2.jpg',
+      '/assets/samosa.jpg',
+      '/assets/nachos.jpg',
+      '/assets/frenchfries.jpg',
+    ],
+    Meals: [
+      '/assets/burger.jpg',
+      '/assets/pizza.jpg',
+      '/assets/burger.jpg',
+      '/assets/pizza.jpg',
+    ],
+    Drinks: [
+      '/assets/frenchfries.jpg', // placeholder
+      '/assets/nachos.jpg',
+    ],
+    Desserts: [
+      '/assets/samosa.jpg',
+      '/assets/springroll.jpg',
+    ]
+  };
+  
+  const images = imageMap[category] || imageMap['Snacks'];
+  return images[index % images.length];
+};
+
+// ----- 25 items per category (unchanged) -----
 const snacks = [
   'Veg Spring Rolls', 'Chicken Wings', 'Onion Rings', 'French Fries', 'Nachos',
   'Samosa', 'Pakora', 'Bruschetta', 'Garlic Bread', 'Stuffed Mushrooms',
@@ -70,7 +68,7 @@ export const dummyMenu = [
     id: index + 1,
     name,
     category: 'Snacks',
-    price: randomPrice(50, 250),      // ₹50–₹250
+    price: randomPrice(50, 250),
     description: `Delicious ${name.toLowerCase()} made fresh.`,
     image: getImageForCategory('Snacks', index)
   })),
@@ -78,7 +76,7 @@ export const dummyMenu = [
     id: 100 + index + 1,
     name,
     category: 'Meals',
-    price: randomPrice(150, 600),      // ₹150–₹600
+    price: randomPrice(150, 600),
     description: `Hearty ${name.toLowerCase()} to satisfy your hunger.`,
     image: getImageForCategory('Meals', index)
   })),
@@ -86,7 +84,7 @@ export const dummyMenu = [
     id: 200 + index + 1,
     name,
     category: 'Drinks',
-    price: randomPrice(30, 180),       // ₹30–₹180
+    price: randomPrice(30, 180),
     description: `Refreshing ${name.toLowerCase()} to quench your thirst.`,
     image: getImageForCategory('Drinks', index)
   })),
@@ -94,13 +92,13 @@ export const dummyMenu = [
     id: 300 + index + 1,
     name,
     category: 'Desserts',
-    price: randomPrice(80, 300),       // ₹80–₹300
+    price: randomPrice(80, 300),
     description: `Sweet ${name.toLowerCase()} to end your meal perfectly.`,
     image: getImageForCategory('Desserts', index)
   }))
 ];
 
-// Orders with status history
+// Orders and customers (unchanged)
 const now = new Date();
 export const dummyOrders = [
   { 

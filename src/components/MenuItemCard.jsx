@@ -7,7 +7,7 @@ const MenuItemCard = ({ item }) => {
 
   const handleAddToCart = () => {
     if (!isTableSelected) {
-      alert('Please select a table first from the Scan page.');
+      alert('Please select a table first.');
       return;
     }
     addItem(item);
@@ -15,7 +15,10 @@ const MenuItemCard = ({ item }) => {
 
   return (
     <div className="menu-card">
-      <div className="card-image" style={{ backgroundImage: `url(${item.image})` }} />
+      <div
+        className="card-image"
+        style={{ backgroundImage: `url(${item.image})` }}
+      ></div>
       <div className="card-content">
         <h3>{item.name}</h3>
         <p className="description">{item.description}</p>
