@@ -8,23 +8,105 @@ const getImageForCategory = (category, index) => {
   const imageMap = {
     Snacks: [
       '/assets/Snacks/maggie.jpg',
+      '/assets/Snacks/Masalamaggie.jpg', // fixed typo: "assests" -> "assets"
+      '/assets/Snacks/cheesemaggie.jpg',
+      '/assets/Snacks/steamedmomos.jpg',
+      '/assets/Snacks/friedmomos.jpg',
+      '/assets/Snacks/kurkuremomos.jpg',
+      '/assets/Snacks/vadapav.jpg',
+      '/assets/Snacks/dabeli.jpg',
+      '/assets/Snacks/samosa.jpg',
+      '/assets/Snacks/nachos.jpg',
+      '/assets/Snacks/frenchfries.jpg',
+      '/assets/Snacks/onionrings.jpg',
+      '/assets/Snacks/aloofrankie.jpg',
+      '/assets/Snacks/schezwanfrankie.jpg',
+      '/assets/Snacks/paneerfrankie.jpg',
+      '/assets/Snacks/poha.jpg',
+      '/assets/Snacks/upma.jpg',
+      '/assets/Snacks/dhokla.jpg',
+      '/assets/Snacks/redsaucepasta.jpg',
+      '/assets/Snacks/whitesaucepasta.jpg',
+      '/assets/Snacks/pestopasta.jpg',
+      '/assets/Snacks/miniburger.jpg',
+      '/assets/Snacks/tacos.jpg',
+      '/assets/Snacks/sandwich.jpg',
+      '/assets/Snacks/grilledsandwich.jpg',
     ],
     Meals: [
-      '/assets/burger.jpg',
-      '/assets/pizza.jpg',
-      '/assets/burger.jpg',
-      '/assets/pizza.jpg',
+      '/assets/Meals/Margheritapizza.jpg',
+      '/assets/Meals/7cheesepizza.jpg',
+      '/assets/Meals/veggiesupremepizza.jpg',
+      '/assets/Meals/pepperonipizza.jpg',
+      '/assets/Meals/paneertikkapizza.jpg',
+      '/assets/Meals/farmhousepizza.jpg',
+      '/assets/Meals/alootikkiburger.jpg',
+      '/assets/Meals/periperiburger.jpg',
+      '/assets/Meals/schezwanburger.jpg',
+      '/assets/Meals/mexicanburger.jpg',
+      '/assets/Meals/italianburger.jpg',
+      '/assets/Meals/cheeseburger.jpg',
+      '/assets/Meals/cholebhature.jpg',
+      '/assets/Meals/pavbhaji.jpg',
+      '/assets/Meals/cholekulche.jpg',
+      '/assets/Meals/idlisambhar.jpg',
+      '/assets/Meals/uttapam.jpg',
+      '/assets/Meals/menduvada.jpg',
+      '/assets/Meals/plaindosa.jpg',
+      '/assets/Meals/masaladosa.jpg',
+      '/assets/Meals/mysoremasaladosa.jpg',
+      '/assets/Meals/cheesemasaladosa.jpg',
+      '/assets/Meals/ravadosa.jpg',
+      '/assets/Meals/bennedosa.jpg',
+      '/assets/Meals/alooparatha.jpg',
     ],
     Beverages: [
-      '/assets/oreo shake.jpg', // placeholder
-      '/assets/coke.jpg',
-      '/assets/frape.jpg',
-      '/assets/coffee.jpg',
-      '/assets/choco shake.jpg',
+      '/assets/Beverages/chai.jpg',
+      '/assets/Beverages/masalachai.jpg',
+      '/assets/Beverages/greentea.jpg',
+      '/assets/Beverages/Blackcoffee.jpg',
+      '/assets/Beverages/coffee.jpg',
+      '/assets/Beverages/Coldcoffee.jpg',
+      '/assets/Beverages/chocolateshake.jpg',
+      '/assets/Beverages/strawberryshake.jpg',
+      '/assets/Beverages/oreoshake.jpg',
+      '/assets/Beverages/brownieshake.jpg',
+      '/assets/Beverages/vanillashake.jpg',
+      '/assets/Beverages/kitkatshake.jpg',
+      '/assets/Beverages/limesoda.jpg',
+      '/assets/Beverages/watermelonjuice.jpg',
+      '/assets/Beverages/orangejuice.jpg',
+      '/assets/Beverages/coke.jpg',
+      '/assets/Beverages/dietcoke.jpg',
+      '/assets/Beverages/sprite.jpg',
+      '/assets/Beverages/fanta.jpg',
+      '/assets/Beverages/lemonade.jpg',
+      '/assets/Beverages/buttermilk.jpg',
+      '/assets/Beverages/lassi.jpg',
+      '/assets/Beverages/mangolassi.jpg',
+      '/assets/Beverages/roselassi.jpg',
+      '/assets/Beverages/hotchocolate.mp4',
+      '/assets/Beverages/water.jpg',
     ],
     Desserts: [
-      '/assets/vanilla icecream.jpg',
-      '/assets/springroll.jpg',
+      '/assets/Desserts/chocolatebrownie.jpg',
+      '/assets/Desserts/cheesecake.jpg',
+      '/assets/Desserts/tiramisu.jpg',
+      '/assets/Desserts/pudding.jpg',
+      '/assets/Desserts/kulfi.jpg',
+      '/assets/Desserts/donut.jpg',
+      '/assets/Desserts/vanillaicecream.jpg',
+      '/assets/Desserts/chocolateicecream.jpg',
+      '/assets/Desserts/chocobrownieicecream.jpg',
+      '/assets/Desserts/oreocrunchwaffle.jpg',
+      '/assets/Desserts/belgianwaffle.jpg',
+      '/assets/Desserts/chocoblastwaffle.jpg',
+      '/assets/Desserts/pancakes.jpg',
+      '/assets/Desserts/cupcake.jpg',
+      '/assets/Desserts/browniesundae.jpg',
+      '/assets/Desserts/chocolatepastry.jpg',
+      '/assets/Desserts/chocolatefudgepastry.jpg',
+      '/assets/Desserts/chocochippastry.jpg',
     ]
   };
   
@@ -32,18 +114,19 @@ const getImageForCategory = (category, index) => {
   return images[index % images.length];
 };
 
-// ----- 25 items per category (unchanged) -----
+// ----- 25 items per category -----
 const snacks = [
- 'Maggie','Masala Maggi','Cheese Maggi',
- 'Steamed Momos','Fried Momos','Kurkure Momos',
- 'Vadapav','Dabeli','Samosa',
- 'Nachos','French Fries','Onion Rings',
- 'Aloo Frankie','Schezwan Frankie','Paneer Frankie',
- 'Poha','Upma','Dhokla',
- 'Red Sauce Pasta','White Sauce Pasta','Pesto Pasta',
- 'Mini Burger','Tacos','Sandwich',
- 'Grilled Cheese Sandwich'
+  'Maggie','Masala Maggi','Cheese Maggi',
+  'Steamed Momos','Fried Momos','Kurkure Momos',
+  'Vadapav','Dabeli','Samosa',
+  'Nachos','French Fries','Onion Rings',
+  'Aloo Frankie','Schezwan Frankie','Paneer Frankie',
+  'Poha','Upma','Dhokla',
+  'Red Sauce Pasta','White Sauce Pasta','Pesto Pasta',
+  'Mini Burger','Tacos','Sandwich',
+  'Grilled Cheese Sandwich'
 ];
+
 const meals = [
   'Margherita Pizza', '7 Cheese Pizza', 'Veggie Supreme Pizza',
   'Pepperoni Pizza', 'Paneer Tikka Pizza', 'Farmhouse Pizza',
@@ -54,9 +137,9 @@ const meals = [
   'Plain Dosa','Masala Dosa','Mysore Masala Dosa',
   'Cheese Masala Dosa','Rava Dosa','Benne Dosa',
   'Aloo paratha'
-
 ];
-const Beverages = [
+
+const beverages = [
   'Chai', 'Masala Chai', 'Green Tea', 
   'Black Coffee','Coffee','Cold Coffee',
   'Chocolate Shake','Strawberry Shake','Oreo Shake',
@@ -66,16 +149,15 @@ const Beverages = [
   'Fanta','Lemonade','Buttermilk',
   'Lassi', 'Mango Lassi','Rose Lassi',
   'Hot Chocolate', 'Mineral Water',
-  
 ];
+
 const desserts = [
   'Chocolate Brownie', 'Cheesecake', 'Tiramisu', 
   'Pudding','Kulfi','Donut',
   'Vanilla Ice Cream','Chocolate Ice Cream','Choco Brownie Ice Cream',
-  'Oreo Crunch Waffle', ' Belgian Waffles', 'Choco Blast Waffle',
+  'Oreo Crunch Waffle', 'Belgian Waffles', 'Choco Blast Waffle',
   'Pancakes', 'Cupcake','Brownie Sundae',
   'Chocolate Pastry','Chocolate Fudge Pastry','Choco Chip Pastry',
-  
 ];
 
 export const dummyMenu = [
@@ -95,7 +177,7 @@ export const dummyMenu = [
     description: `Hearty ${name.toLowerCase()} to satisfy your hunger.`,
     image: getImageForCategory('Meals', index)
   })),
-  ...drinks.map((name, index) => ({
+  ...beverages.map((name, index) => ({    // FIXED: changed 'drinks' to 'beverages'
     id: 200 + index + 1,
     name,
     category: 'Beverages',
