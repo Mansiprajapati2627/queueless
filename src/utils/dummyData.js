@@ -7,16 +7,7 @@ const randomPrice = (min, max) => {
 const getImageForCategory = (category, index) => {
   const imageMap = {
     Snacks: [
-      '/assets/springroll.jpg',
-      '/assets/vadapav.jpg',
-      '/assets/onionrings.jpg',
-      '/assets/frenchfries.jpg',
-      '/assets/nachos.jpg',
-      '/assets/samosa.jpg',
-      '/assets/pakora.jpg',
-      '/assets/bruschetta.jpg',
-      '/assets/garlicbread.jpg',
-      '/assets/dabeli.jpg',
+      '/assets/Snacks/maggie.jpg',
     ],
     Meals: [
       '/assets/burger.jpg',
