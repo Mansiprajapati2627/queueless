@@ -85,7 +85,7 @@ const getImageForCategory = (category, index) => {
       '/assets/Beverages/lassi.jpg',
       '/assets/Beverages/mangolassi.jpg',
       '/assets/Beverages/roselassi.jpg',
-      '/assets/Beverages/hotchocolate.mp4',
+      '/assets/Beverages/hotchocolate.jpg',
       '/assets/Beverages/water.jpg',
     ],
     Desserts: [
@@ -102,11 +102,11 @@ const getImageForCategory = (category, index) => {
       '/assets/Desserts/belgianwaffle.jpg',
       '/assets/Desserts/chocoblastwaffle.jpg',
       '/assets/Desserts/pancakes.jpg',
-      '/assets/Desserts/cupcake.jpg',
+      '/assets/Desserts/Cupcakes.jpg',
       '/assets/Desserts/browniesundae.jpg',
-      '/assets/Desserts/chocolatepastry.jpg',
-      '/assets/Desserts/chocolatefudgepastry.jpg',
-      '/assets/Desserts/chocochippastry.jpg',
+      '/assets/Desserts/Chocolatepastry.jpg',
+      '/assets/Desserts/Chocolatefudge.jpg',
+      '/assets/Desserts/Chocolatechippastry.jpg',
     ]
   };
   
