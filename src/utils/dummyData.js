@@ -79,14 +79,12 @@ const Beverages = [
 ];
 const desserts = [
   'Chocolate Brownie', 'Cheesecake', 'Tiramisu', 
-  'Gulab Jamun','Pudding','Rasgulla',
+  'Pudding','Kulfi','Donut',
   'Vanilla Ice Cream','Chocolate Ice Cream','Choco Brownie Ice Cream',
-  'Rasmalai', 'Jalebi','Rabri',
-  'Kulfi', 'Gajar Ka Halwa', 'Kalakand',
   'Oreo Crunch Waffle', ' Belgian Waffles', 'Choco Blast Waffle',
   'Pancakes', 'Cupcake','Brownie Sundae',
   'Chocolate Pastry','Chocolate Fudge Pastry','Choco Chip Pastry',
-  'Donut'
+  
 ];
 
 export const dummyMenu = [
