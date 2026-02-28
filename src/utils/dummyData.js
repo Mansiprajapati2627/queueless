@@ -24,7 +24,7 @@ const getImageForCategory = (category, index) => {
       '/assets/burger.jpg',
       '/assets/pizza.jpg',
     ],
-    Drinks: [
+    Beverages: [
       '/assets/oreo shake.jpg', // placeholder
       '/assets/coke.jpg',
       '/assets/frape.jpg',
@@ -43,32 +43,50 @@ const getImageForCategory = (category, index) => {
 
 // ----- 25 items per category (unchanged) -----
 const snacks = [
-  'Veg Spring Rolls', 'Chicken Wings', 'Onion Rings', 'French Fries', 'Nachos',
-  'Samosa', 'Pakora', 'Bruschetta', 'Garlic Bread', 'Stuffed Mushrooms',
-  'Mozzarella Sticks', 'Jalapeno Poppers', 'Chicken Tenders', 'Fish Fingers', 'Calamari',
-  'Spring Rolls', 'Vegetable Cutlet', 'Paneer Tikka', 'Chicken Satay', 'Prawn Toast',
-  'Cheese Balls', 'Potato Wedges', 'Onion Bhaji', 'Chilli Chicken', 'Gobi Manchurian'
+ 'Maggie','Masala Maggi','Cheese Maggi',
+ 'Steamed Momos','Fried Momos','Kurkure Momos',
+ 'Vadapav','Dabeli','Samosa',
+ 'Nachos','French Fries','Onion Rings',
+ 'Aloo Frankie','Schezwan Frankie','Paneer Frankie',
+ 'Poha','Upma','Dhokla',
+ 'Red Sauce Pasta','White Sauce Pasta','Pesto Pasta',
+ 'Mini Burger','Tacos','Sandwich',
+ 'Grilled Cheese Sandwich'
 ];
 const meals = [
-  'Margherita Pizza', 'Chicken Burger', 'Veg Burger', 'Grilled Chicken', 'Fish & Chips',
-  'Chicken Biryani', 'Veg Biryani', 'Pasta Alfredo', 'Pasta Arrabiata', 'Lasagna',
-  'Steak', 'Grilled Salmon', 'Chicken Curry', 'Paneer Butter Masala', 'Dal Makhani',
-  'Noodles', 'Fried Rice', 'Burrito', 'Tacos', 'Quesadilla',
-  'Shawarma', 'Falafel Wrap', 'Meatball Sub', 'Club Sandwich', 'Caesar Salad'
+  'Margherita Pizza', '7 Cheese Pizza', 'Veggie Supreme Pizza',
+  'Pepperoni Pizza', 'Paneer Tikka Pizza', 'Farmhouse Pizza',
+  'Aloo Tikki Burger', 'Peri Peri Burger', 'Schezwan Burger',
+  'Mexican Burger', 'Italian Burger', 'Cheese Burger', 
+  'Chole Bhature','Pav Bhaji','Chole Kulche',
+  'idli Sambhar','Uttapam','Mendu Vada',
+  'Plain Dosa','Masala Dosa','Mysore Masala Dosa',
+  'Cheese Masala Dosa','Rava Dosa','Benne Dosa',
+  'Aloo paratha'
+
 ];
-const drinks = [
-  'Iced Latte', 'Cappuccino', 'Mocha', 'Hot Chocolate', 'Espresso',
-  'Green Tea', 'Masala Chai', 'Lemonade', 'Mango Smoothie', 'Strawberry Shake',
-  'Oreo Shake', 'Cold Coffee', 'Fresh Lime Soda', 'Watermelon Juice', 'Orange Juice',
-  'Pineapple Juice', 'Coke', 'Diet Coke', 'Sprite', 'Fanta',
-  'Mint Mojito', 'Blue Lagoon', 'Virgin Mojito', 'Lassi', 'Buttermilk'
+const Beverages = [
+  'Chai', 'Masala Chai', 'Green Tea', 
+  'Black Coffee','Coffee','Cold Coffee',
+  'Chocolate Shake','Strawberry Shake','Oreo Shake',
+  'Brownie Shake','Vanilla Shake','Kitkat Shake',
+  'Fresh Lime Soda', 'Watermelon Juice', 'Orange Juice',
+  'Coke', 'Diet Coke', 'Sprite',
+  'Fanta','Lemonade','Buttermilk',
+  'Lassi', 'Mango Lassi','Rose Lassi',
+  'Hot Chocolate', 'Mineral Water',
+  
 ];
 const desserts = [
-  'Chocolate Brownie', 'Cheesecake', 'Tiramisu', 'Gulab Jamun', 'Ice Cream',
-  'Chocolate Mousse', 'Panna Cotta', 'Fruit Tart', 'Apple Pie', 'Banoffee Pie',
-  'Red Velvet Cake', 'Carrot Cake', 'Lava Cake', 'Rasmalai', 'Jalebi',
-  'Kulfi', 'Gajar Ka Halwa', 'Falooda', 'Brownie Sundae', 'Waffles',
-  'Pancakes', 'Donuts', 'Cinnamon Roll', 'Macarons', 'Cupcake'
+  'Chocolate Brownie', 'Cheesecake', 'Tiramisu', 
+  'Gulab Jamun','Pudding','Rasgulla',
+  'Vanilla Ice Cream','Chocolate Ice Cream','Choco Brownie Ice Cream',
+  'Rasmalai', 'Jalebi','Rabri',
+  'Kulfi', 'Gajar Ka Halwa', 'Kalakand',
+  'Oreo Crunch Waffle', ' Belgian Waffles', 'Choco Blast Waffle',
+  'Pancakes', 'Cupcake','Brownie Sundae',
+  'Chocolate Pastry','Chocolate Fudge Pastry','Choco Chip Pastry',
+  'Donut'
 ];
 
 export const dummyMenu = [
@@ -91,10 +109,10 @@ export const dummyMenu = [
   ...drinks.map((name, index) => ({
     id: 200 + index + 1,
     name,
-    category: 'Drinks',
+    category: 'Beverages',
     price: randomPrice(30, 180),
     description: `Refreshing ${name.toLowerCase()} to quench your thirst.`,
-    image: getImageForCategory('Drinks', index)
+    image: getImageForCategory('Beverages', index)
   })),
   ...desserts.map((name, index) => ({
     id: 300 + index + 1,
