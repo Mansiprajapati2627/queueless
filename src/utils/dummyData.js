@@ -8,10 +8,15 @@ const getImageForCategory = (category, index) => {
   const imageMap = {
     Snacks: [
       '/assets/springroll.jpg',
-      '/assets/springroll2.jpg',
-      '/assets/samosa.jpg',
-      '/assets/nachos.jpg',
+      '/assets/vadapav.jpg',
+      '/assets/onionrings.jpg',
       '/assets/frenchfries.jpg',
+      '/assets/nachos.jpg',
+      '/assets/samosa.jpg',
+      '/assets/pakora.jpg',
+      '/assets/bruschetta.jpg',
+      '/assets/garlicbread.jpg',
+      '/assets/dabeli.jpg',
     ],
     Meals: [
       '/assets/burger.jpg',
@@ -20,11 +25,14 @@ const getImageForCategory = (category, index) => {
       '/assets/pizza.jpg',
     ],
     Drinks: [
-      '/assets/frenchfries.jpg', // placeholder
-      '/assets/nachos.jpg',
+      '/assets/oreo shake.jpg', // placeholder
+      '/assets/coke.jpg',
+      '/assets/frape.jpg',
+      '/assets/coffee.jpg',
+      '/assets/choco shake.jpg',
     ],
     Desserts: [
-      '/assets/samosa.jpg',
+      '/assets/vanilla icecream.jpg',
       '/assets/springroll.jpg',
     ]
   };
