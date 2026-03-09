@@ -152,23 +152,6 @@ const ProfilePage = () => {
         </div>
       </section>
 
-   
-
-      {/* Saved Addresses */}
-      <section className="profile-section">
-        <h3>Saved Addresses</h3>
-        {addresses.map(addr => (
-          <div key={addr.id} className="address-item">
-            <MapPin size={20} />
-            <div>
-              <strong>{addr.label}</strong>
-              <p>{addr.address}</p>
-            </div>
-          </div>
-        ))}
-        <button className="add-address-btn">+ Add New Address</button>
-      </section>
-
       {/* Account Settings */}
       <section className="profile-section">
         <h3>Account Settings</h3>
