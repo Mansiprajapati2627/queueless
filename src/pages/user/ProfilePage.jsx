@@ -152,19 +152,7 @@ const ProfilePage = () => {
         </div>
       </section>
 
-      {/* Saved Payment Methods */}
-      <section className="profile-section">
-        <h3>Payment Methods</h3>
-        <div className="cards-list">
-          {savedCards.map(card => (
-            <div key={card.id} className="card-item">
-              <CreditCard size={20} />
-              <span>{card.brand} •••• {card.last4}</span>
-            </div>
-          ))}
-          <button className="add-card-btn">+ Add New Card</button>
-        </div>
-      </section>
+   
 
       {/* Saved Addresses */}
       <section className="profile-section">
