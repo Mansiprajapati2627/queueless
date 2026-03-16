@@ -571,6 +571,16 @@
   border: none;
   cursor: pointer;
 }
+.modal-success {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+  border: 1px solid #a7f3d0;
+}
 
 .modal-submit:hover:not(:disabled) {
   background: var(--accent-secondary);

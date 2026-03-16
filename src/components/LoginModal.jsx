@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const { login, register } = useAuth();
-  const navigate = useNavigate();
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState('login'); // 'login' or 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Close modal on escape key
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
 
   const resetForm = () => {
     setEmail('');
@@ -20,6 +34,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     setName('');
     setPhone('');
     setError('');
+    setSuccessMessage('');
   };
 
   const handleClose = () => {
@@ -32,43 +47,42 @@ const LoginModal = ({ isOpen, onClose }) => {
     if (e.target === e.currentTarget) handleClose();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
       if (mode === 'login') {
-        const success = login(email.trim(), password.trim());
-        if (success) {
-          // Redirect based on email immediately
-          if (email.trim().toLowerCase() === 'admin@queueless.com') {
-            navigate('/admin');
-          } else {
-            navigate('/profile');
-          }
+        const result = await login(email, password);
+        if (result.success) {
           handleClose();
         } else {
-          setError('Invalid email or password');
+          setError(result.error || 'Login failed');
         }
       } else {
-        // Signup mode
-        const result = register(name.trim(), email.trim(), password.trim(), phone.trim());
+        const result = await register(name, email, password, phone);
         if (result.success) {
-          // Auto-login after signup, redirect to profile
-          navigate('/profile');
-          handleClose();
+          setSuccessMessage('Registration successful! You can now log in.');
+          setMode('login');
+          setPassword('');
+          // Keep email prefilled
         } else {
-          setError(result.error);
+          setError(result.error || 'Registration failed');
         }
       }
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const toggleMode = () => {
     setMode(mode === 'login' ? 'signup' : 'login');
     setError('');
+    setSuccessMessage('');
   };
 
   if (!isOpen) return null;
@@ -79,7 +93,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         <button className="modal-close" onClick={handleClose}>
           <X size={20} />
         </button>
-        
+
         <div className="modal-header">
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{mode === 'login' ? 'Login to your account' : 'Sign up to get started'}</p>
@@ -87,7 +101,8 @@ const LoginModal = ({ isOpen, onClose }) => {
 
         <form onSubmit={handleSubmit} className="modal-form">
           {error && <div className="modal-error">{error}</div>}
-          
+          {successMessage && <div className="modal-success">{successMessage}</div>}
+
           {mode === 'signup' && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
