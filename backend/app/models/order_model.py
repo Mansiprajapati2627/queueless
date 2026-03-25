@@ -10,7 +10,7 @@ class Order(Base):
     user_id = Column(Integer, ForeignKey("users.user_id"))
     table_id = Column(Integer, ForeignKey("tables.table_id"))
     order_type = Column(Enum('dine_in', 'parcel'), nullable=False)
-    order_status = Column(Enum('pending', 'preparing', 'ready', 'completed'), default='pending')
+    order_status = Column(Enum('pending', 'accepted', 'preparing', 'ready', 'completed'), default='pending')
     total_amount = Column(DECIMAL(10,2))
     order_time = Column(TIMESTAMP, server_default=func.current_timestamp())
 

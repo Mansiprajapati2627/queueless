@@ -2,12 +2,14 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-const PrivateRoute = ({ children }) => {
-  const { user, isAdmin } = useAuth();
-  if (!user || !isAdmin) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
+export const PrivateRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return <div className="loading-spinner">Loading...</div>;
+  return isAuthenticated ? children : <Navigate to="/" replace />;
 };
 
-export default PrivateRoute;
+export const AdminRoute = ({ children }) => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+  if (loading) return <div className="loading-spinner">Loading...</div>;
+  return isAuthenticated && isAdmin ? children : <Navigate to="/" replace />;
+};

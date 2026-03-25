@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { dummyMenu } from '../../utils/dummyData';
+import { fetchMenu, createMenuItem, updateMenuItem, deleteMenuItem } from '../../services/menuService';
 import { formatCurrency } from '../../utils/helpers';
 import { Search, Edit, Trash2, Plus, X, Save, AlertCircle } from 'lucide-react';
 
@@ -11,33 +11,25 @@ const AdminMenu = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newItem, setNewItem] = useState({
-    name: '',
+    item_name: '',
     description: '',
     price: '',
     category: 'Snacks',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'
+    image_url: '',
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Load from localStorage or dummy data
   useEffect(() => {
-    const saved = localStorage.getItem('adminMenu');
-    if (saved) {
-      setMenuItems(JSON.parse(saved));
-    } else {
-      // Add inStock property to dummy items
-      const initial = dummyMenu.map(item => ({ ...item, inStock: true }));
-      setMenuItems(initial);
-      localStorage.setItem('adminMenu', JSON.stringify(initial));
-    }
+    loadMenu();
   }, []);
 
-  // Filter items when search or category changes
   useEffect(() => {
     let filtered = menuItems;
     if (searchTerm) {
       filtered = filtered.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+        item.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     if (categoryFilter !== 'all') {
@@ -46,12 +38,17 @@ const AdminMenu = () => {
     setFilteredItems(filtered);
   }, [searchTerm, categoryFilter, menuItems]);
 
-  // Save to localStorage whenever menu changes
-  useEffect(() => {
-    if (menuItems.length > 0) {
-      localStorage.setItem('adminMenu', JSON.stringify(menuItems));
+  const loadMenu = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchMenu();
+      setMenuItems(data);
+    } catch (err) {
+      setError('Failed to load menu');
+    } finally {
+      setLoading(false);
     }
-  }, [menuItems]);
+  };
 
   const categories = ['all', ...new Set(menuItems.map(i => i.category))];
 
@@ -67,49 +64,62 @@ const AdminMenu = () => {
     }));
   };
 
-  const handleEditSave = () => {
-    setMenuItems(prev =>
-      prev.map(item => item.id === editingItem.id ? editingItem : item)
-    );
-    setEditingItem(null);
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
-      setMenuItems(prev => prev.filter(item => item.id !== id));
+  const handleEditSave = async () => {
+    try {
+      await updateMenuItem(editingItem.item_id, editingItem);
+      await loadMenu(); // refresh list
+      setEditingItem(null);
+    } catch (err) {
+      alert('Failed to update item');
     }
   };
 
-  const handleToggleStock = (id) => {
-    setMenuItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, inStock: !item.inStock } : item
-      )
-    );
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      try {
+        await deleteMenuItem(id);
+        await loadMenu();
+      } catch (err) {
+        alert('Failed to delete item');
+      }
+    }
   };
 
-  const handleAddItem = () => {
-    if (!newItem.name || !newItem.price) {
+  const handleToggleStock = async (id, currentAvailability) => {
+    try {
+      await updateMenuItem(id, { availability: !currentAvailability });
+      await loadMenu();
+    } catch (err) {
+      alert('Failed to update availability');
+    }
+  };
+
+  const handleAddItem = async () => {
+    if (!newItem.item_name || !newItem.price) {
       alert('Please fill at least name and price');
       return;
     }
-    const newId = Math.max(...menuItems.map(i => i.id)) + 1;
-    const itemToAdd = {
-      ...newItem,
-      id: newId,
-      price: parseFloat(newItem.price),
-      inStock: true,
-    };
-    setMenuItems(prev => [...prev, itemToAdd]);
-    setShowAddForm(false);
-    setNewItem({
-      name: '',
-      description: '',
-      price: '',
-      category: 'Snacks',
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300'
-    });
+    try {
+      await createMenuItem({
+        ...newItem,
+        price: parseFloat(newItem.price),
+      });
+      await loadMenu();
+      setShowAddForm(false);
+      setNewItem({
+        item_name: '',
+        description: '',
+        price: '',
+        category: 'Snacks',
+        image_url: '',
+      });
+    } catch (err) {
+      alert('Failed to add item');
+    }
   };
+
+  if (loading) return <div className="loading-spinner">Loading...</div>;
+  if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div className="admin-menu">
@@ -151,8 +161,8 @@ const AdminMenu = () => {
                 <label>Name *</label>
                 <input
                   type="text"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                  value={newItem.item_name}
+                  onChange={(e) => setNewItem({...newItem, item_name: e.target.value})}
                   placeholder="e.g., Chicken Burger"
                 />
               </div>
@@ -184,7 +194,7 @@ const AdminMenu = () => {
                 >
                   <option value="Snacks">Snacks</option>
                   <option value="Meals">Meals</option>
-                  <option value="Drinks">Drinks</option>
+                  <option value="Beverages">Beverages</option>
                   <option value="Desserts">Desserts</option>
                 </select>
               </div>
@@ -192,10 +202,11 @@ const AdminMenu = () => {
                 <label>Image URL</label>
                 <input
                   type="text"
-                  value={newItem.image}
-                  onChange={(e) => setNewItem({...newItem, image: e.target.value})}
-                  placeholder="https://..."
+                  value={newItem.image_url}
+                  onChange={(e) => setNewItem({...newItem, image_url: e.target.value})}
+                  placeholder="/assets/Snacks/maggie.jpg"
                 />
+                <small>Path relative to frontend root (e.g., /assets/...)</small>
               </div>
             </div>
             <div className="modal-footer">
@@ -219,8 +230,8 @@ const AdminMenu = () => {
                 <label>Name</label>
                 <input
                   type="text"
-                  name="name"
-                  value={editingItem.name}
+                  name="item_name"
+                  value={editingItem.item_name}
                   onChange={handleEditChange}
                 />
               </div>
@@ -228,7 +239,7 @@ const AdminMenu = () => {
                 <label>Description</label>
                 <textarea
                   name="description"
-                  value={editingItem.description}
+                  value={editingItem.description || ''}
                   onChange={handleEditChange}
                   rows="2"
                 />
@@ -248,7 +259,7 @@ const AdminMenu = () => {
                 <select name="category" value={editingItem.category} onChange={handleEditChange}>
                   <option value="Snacks">Snacks</option>
                   <option value="Meals">Meals</option>
-                  <option value="Drinks">Drinks</option>
+                  <option value="Beverages">Beverages</option>
                   <option value="Desserts">Desserts</option>
                 </select>
               </div>
@@ -256,17 +267,19 @@ const AdminMenu = () => {
                 <label>Image URL</label>
                 <input
                   type="text"
-                  name="image"
-                  value={editingItem.image}
+                  name="image_url"
+                  value={editingItem.image_url || ''}
                   onChange={handleEditChange}
+                  placeholder="/assets/..."
                 />
+                <small>Path relative to frontend root (e.g., /assets/Snacks/maggie.jpg)</small>
               </div>
               <div className="form-group checkbox">
                 <label>
                   <input
                     type="checkbox"
-                    name="inStock"
-                    checked={editingItem.inStock}
+                    name="availability"
+                    checked={editingItem.availability}
                     onChange={handleEditChange}
                   />
                   In Stock
@@ -284,13 +297,13 @@ const AdminMenu = () => {
       {/* Items Grid */}
       <div className="menu-items-grid">
         {filteredItems.map(item => (
-          <div key={item.id} className={`menu-item-card ${!item.inStock ? 'out-of-stock' : ''}`}>
+          <div key={item.item_id} className={`menu-item-card ${!item.availability ? 'out-of-stock' : ''}`}>
             <div className="item-image">
-              <img src={item.image} alt={item.name} />
-              {!item.inStock && <span className="stock-badge">Out of Stock</span>}
+              <img src={item.image_url} alt={item.item_name} />
+              {!item.availability && <span className="stock-badge">Out of Stock</span>}
             </div>
             <div className="item-details">
-              <h3>{item.name}</h3>
+              <h3>{item.item_name}</h3>
               <p className="item-description">{item.description}</p>
               <div className="item-meta">
                 <span className="item-price">{formatCurrency(item.price)}</span>
@@ -300,10 +313,10 @@ const AdminMenu = () => {
                 <button className="edit-btn" onClick={() => handleEdit(item)}>
                   <Edit size={16} /> Edit
                 </button>
-                <button className="stock-btn" onClick={() => handleToggleStock(item.id)}>
-                  {item.inStock ? 'Mark Out of Stock' : 'Mark In Stock'}
+                <button className="stock-btn" onClick={() => handleToggleStock(item.item_id, item.availability)}>
+                  {item.availability ? 'Mark Out of Stock' : 'Mark In Stock'}
                 </button>
-                <button className="delete-btn" onClick={() => handleDelete(item.id)}>
+                <button className="delete-btn" onClick={() => handleDelete(item.item_id)}>
                   <Trash2 size={16} /> Delete
                 </button>
               </div>

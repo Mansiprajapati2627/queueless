@@ -1,166 +1,156 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useOrders } from '../../hooks/useOrders';
-import { Link } from 'react-router-dom';
-import { User, Package, Heart, Settings, Award, CreditCard, MapPin } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../../services/api';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
 import { formatCurrency } from '../../utils/helpers';
-import { dummyMenu } from '../../utils/dummyData';
+import { Package, CreditCard, LogOut } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { user, login, logout, updateProfile } = useAuth();
-  const { getUserOrders } = useOrders();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: user?.name || '',
-    phone: user?.phone || '',
-  });
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for additional sections
-  const favoriteItems = dummyMenu.slice(0, 4); // first 4 items as favorites
-  const loyaltyPoints = 250;
-  const savedCards = [
-    { id: 1, last4: '4242', brand: 'Visa' },
-    { id: 2, last4: '1234', brand: 'Mastercard' }
-  ];
-  const addresses = [
-    { id: 1, label: 'Home', address: '123 Main St, New York, NY 10001' }
-  ];
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await api.get('/orders');
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, [user]);
 
-  if (!user) {
-    return (
-      <div className="profile-page">
-        <h2>Profile</h2>
-        <p>You are not logged in.</p>
-        <Link to="/login" className="login-link">Go to Login</Link>
-      </div>
-    );
-  }
-
-  const userOrders = getUserOrders(user.email);
-
-  const handleEditToggle = () => {
-    if (isEditing) {
-      // Save changes
-      updateProfile(editForm);
-    }
-    setIsEditing(!isEditing);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
-  const handleInputChange = (e) => {
-    setEditForm({
-      ...editForm,
-      [e.target.name]: e.target.value
-    });
+  if (!user) return <div className="loading-spinner">Loading...</div>;
+
+  const userOrders = orders.filter(order => order.user_id === user.user_id);
+  const currentOrders = userOrders.filter(order => order.order_status !== 'completed');
+  const pastOrders = userOrders.filter(order => order.order_status === 'completed');
+  const totalSpent = userOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
+
+  // Format phone number (Indian style)
+  const formatPhone = (phone) => {
+    if (!phone) return '';
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`;
+    }
+    if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      return `+91 ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+    }
+    return phone;
   };
 
   return (
-    <div className="profile-page expanded">
-      {/* Profile Header */}
+    <div className="profile-page">
       <div className="profile-header">
-        <div className="avatar">
-          <User size={48} />
+        <div className="profile-avatar">
+          {user.name?.charAt(0).toUpperCase()}
         </div>
-        <div className="profile-title">
+        <div className="profile-info">
           <h2>{user.name}</h2>
-          <p>{user.email}</p>
-          <p>{user.phone}</p>
+          <p className="profile-email">{user.email}</p>
+          <p className="profile-phone">{formatPhone(user.phone)}</p>
+          <span className={`profile-role ${user.role}`}>
+            {user.role === 'admin' ? 'Administrator' : 'Customer'}
+          </span>
         </div>
-        <button className="edit-profile-btn" onClick={handleEditToggle}>
-          {isEditing ? 'Save' : 'Edit Profile'}
-        </button>
+        <div className="profile-actions">
+          <button onClick={handleLogout} className="logout-btn">
+            <LogOut size={16} /> Logout
+          </button>
+        </div>
       </div>
 
-      {/* Edit Profile Form (conditional) */}
-      {isEditing && (
-        <div className="edit-profile-form">
-          <input
-            type="text"
-            name="name"
-            value={editForm.name}
-            onChange={handleInputChange}
-            placeholder="Name"
-          />
-          <input
-            type="tel"
-            name="phone"
-            value={editForm.phone}
-            onChange={handleInputChange}
-            placeholder="Phone"
-          />
-        </div>
-      )}
-
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="profile-stats">
         <div className="stat-card">
           <Package size={24} />
-          <span className="stat-value">{userOrders.length}</span>
-          <span className="stat-label">Total Orders</span>
+          <div>
+            <p className="stat-value">{userOrders.length}</p>
+            <p className="stat-label">Total Orders</p>
+          </div>
         </div>
         <div className="stat-card">
-          <Award size={24} />
-          <span className="stat-value">{loyaltyPoints}</span>
-          <span className="stat-label">Loyalty Points</span>
-        </div>
-        <div className="stat-card">
-          <Heart size={24} />
-          <span className="stat-value">{favoriteItems.length}</span>
-          <span className="stat-label">Favorites</span>
+          <CreditCard size={24} />
+          <div>
+            <p className="stat-value">{formatCurrency(totalSpent)}</p>
+            <p className="stat-label">Total Spent</p>
+          </div>
         </div>
       </div>
 
-      {/* Recent Orders */}
-      <section className="profile-section">
-        <h3>Recent Orders</h3>
-        {userOrders.length === 0 ? (
-          <p className="empty-message">No orders yet.</p>
-        ) : (
+      {/* Active Orders */}
+      {currentOrders.length > 0 && (
+        <section className="profile-section">
+          <h3>Active Orders</h3>
           <div className="orders-list">
-            {userOrders.slice(0, 3).map(order => (
-              <div key={order.id} className="order-item">
+            {currentOrders.map(order => (
+              <div key={order.order_id} className="order-item">
                 <div className="order-header">
-                  <span className="order-id">Order #{order.id}</span>
-                  <OrderStatusBadge status={order.status} />
+                  <span className="order-id">Order #{order.order_id}</span>
+                  <OrderStatusBadge status={order.order_status} />
                 </div>
-                <div className="order-details">
-                  <span>{order.items.length} items</span>
-                  <span className="order-total">{formatCurrency(order.total)}</span>
+                <div className="order-items-preview">
+                  {order.items?.slice(0, 2).map((item, idx) => (
+                    <span key={idx}>{item.quantity}× {item.menu_item?.item_name}</span>
+                  ))}
+                  {order.items?.length > 2 && <span>+{order.items.length - 2} more</span>}
                 </div>
+                <div className="order-total">{formatCurrency(order.total_amount)}</div>
+                <Link to={`/tracking?order=${order.order_id}`} className="order-link">
+                  Track Order →
+                </Link>
               </div>
             ))}
-            {userOrders.length > 3 && (
-              <Link to="/tracking" className="view-all-link">View All Orders</Link>
-            )}
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
-      {/* Favorite Items */}
-      <section className="profile-section">
-        <h3>Favorite Items</h3>
-        <div className="favorites-grid">
-          {favoriteItems.map(item => (
-            <div key={item.id} className="favorite-card">
-              <div className="favorite-image" style={{ backgroundImage: `url(${item.image})` }} />
-              <div className="favorite-info">
-                <h4>{item.name}</h4>
-                <span className="price">{formatCurrency(item.price)}</span>
+      {/* Past Orders */}
+      {pastOrders.length > 0 && (
+        <section className="profile-section">
+          <h3>Order History</h3>
+          <div className="orders-list compact">
+            {pastOrders.map(order => (
+              <div key={order.order_id} className="order-item compact">
+                <div className="order-header">
+                  <span className="order-id">Order #{order.order_id}</span>
+                  <span className="order-date">
+                    {new Date(order.order_time).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="order-items-preview">
+                  {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}
+                </div>
+                <div className="order-total">{formatCurrency(order.total_amount)}</div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* Account Settings */}
-      <section className="profile-section">
-        <h3>Account Settings</h3>
-        <div className="settings-links">
-          <Link to="/change-password" className="settings-link">Change Password</Link>
-          <Link to="/notifications" className="settings-link">Notification Preferences</Link>
-          <button onClick={logout} className="logout-btn">Logout</button>
-        </div>
-      </section>
+      {/* No orders message */}
+      {userOrders.length === 0 && (
+        <section className="profile-section">
+          <p className="empty-message">You haven't placed any orders yet.</p>
+          <Link to="/menu" className="order-link">Start ordering →</Link>
+        </section>
+      )}
     </div>
   );
 };

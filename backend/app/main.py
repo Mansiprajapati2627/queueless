@@ -10,20 +10,21 @@ from app.routes import (
 )
 from app.config.database import engine, Base
 
-# Create tables (development only)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="QueueLess Backend")
 
-# CORS configuration – allow React frontend
+# CORS configuration – allow your frontend origin
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Add both
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Include routers
+
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(table_routes.router, prefix="/tables", tags=["Tables"])

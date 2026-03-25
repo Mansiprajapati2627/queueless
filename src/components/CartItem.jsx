@@ -1,12 +1,17 @@
 import React from 'react';
-import { formatCurrency } from '../utils/helpers';
 import { useCart } from '../hooks/useCart';
+import { formatCurrency } from '../utils/helpers';
 
 const CartItem = ({ item }) => {
   const { updateQuantity, removeItem } = useCart();
 
   return (
     <div className="cart-item">
+      {item.image && (
+        <div className="cart-item-image">
+          <img src={item.image} alt={item.name} />
+        </div>
+      )}
       <div className="item-info">
         <h4>{item.name}</h4>
         <p>{formatCurrency(item.price)} each</p>

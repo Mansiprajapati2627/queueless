@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
+import { useAuth } from '../../hooks/useAuth';
+import api from '../../services/api';
+import { formatCurrency } from '../../utils/helpers';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { Clock, Coffee, Award, Users, Star, TrendingUp } from 'lucide-react';
-import { dummyMenu } from '../../utils/dummyData';
 
 const slides = [
   { id: 1, image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200', title: 'Fresh Ingredients' },
@@ -24,11 +27,26 @@ const features = [
   { icon: TrendingUp, title: 'Fast Service', description: 'Quick order processing' },
 ];
 
-const popularItems = dummyMenu.filter((_, index) => index < 6);
-
 const HomePage = () => {
   const { tableNumber } = useCart();
+  const { user } = useAuth();
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const response = await api.get('/menu');
+        setMenuItems(response.data);
+      } catch (error) {
+        console.error('Failed to fetch menu:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMenu();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -36,6 +54,11 @@ const HomePage = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Popular dishes – take first 6 items (you can change this logic)
+  const popularItems = menuItems.slice(0, 6);
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="home-page">
@@ -46,7 +69,7 @@ const HomePage = () => {
         {tableNumber && <p className="table-badge">You are at Table {tableNumber}</p>}
       </section>
 
-      {/* Image Slideshow */}
+      {/* Slideshow */}
       <section className="slideshow-section">
         <h2>Our Culinary Highlights</h2>
         <div className="slideshow-container">
@@ -71,13 +94,13 @@ const HomePage = () => {
         <h2>Popular Dishes</h2>
         <div className="dishes-grid">
           {popularItems.map(item => (
-            <div key={item.id} className="dish-card">
-              <div className="dish-image" style={{ backgroundImage: `url(${item.image})` }} />
+            <div key={item.item_id} className="dish-card">
+              <div className="dish-image" style={{ backgroundImage: `url(${item.image_url})` }} />
               <div className="dish-info">
-                <h3>{item.name}</h3>
+                <h3>{item.item_name}</h3>
                 <p>{item.description}</p>
                 <div className="dish-footer">
-                  <span className="price">${item.price.toFixed(2)}</span>
+                  <span className="price">{formatCurrency(item.price)}</span>
                   <Link to="/menu" className="dish-link">View</Link>
                 </div>
               </div>

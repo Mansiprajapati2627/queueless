@@ -4,16 +4,10 @@ from app.services import menu_service
 from app.schemas.menu_schema import MenuCreate, MenuResponse, MenuUpdate
 from app.utils.auth import get_db, get_current_admin_user
 from app.models.user_model import User
+
 router = APIRouter()
 
-@router.post("/", response_model=MenuResponse)
-def create_menu_item(
-    item: MenuCreate,
-    db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
-):
-    return menu_service.create_menu_item(db, item)
-
+# Public endpoints (no authentication)
 @router.get("/", response_model=list[MenuResponse])
 def read_menu_items(
     skip: int = 0,
@@ -32,6 +26,15 @@ def read_menu_item(
     if not db_item:
         raise HTTPException(status_code=404, detail="Item not found")
     return db_item
+
+# Admin only endpoints (require authentication and admin role)
+@router.post("/", response_model=MenuResponse)
+def create_menu_item(
+    item: MenuCreate,
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_current_admin_user),
+):
+    return menu_service.create_menu_item(db, item)
 
 @router.put("/{item_id}", response_model=MenuResponse)
 def update_menu_item(

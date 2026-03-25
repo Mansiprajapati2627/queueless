@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { useCart } from '../../hooks/useCart';
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import CartItem from '../../components/CartItem';
 import PaymentForm from '../../components/PaymentForm';
 import { formatCurrency } from '../../utils/helpers';
 import { Link } from 'react-router-dom';
 import { Edit } from 'lucide-react';
+import api from '../../services/api';
 
 const CartPage = () => {
-  const { items, total, isTableSelected, tableNumber, setTableNumber } = useCart();
+  const { items, total, isTableSelected, tableNumber, setTableNumber, clearCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isChangingTable, setIsChangingTable] = useState(false);
   const [newTable, setNewTable] = useState('');
+  const [placing, setPlacing] = useState(false);
 
   const handleTableChange = () => {
     const num = parseInt(newTable, 10);
@@ -19,6 +25,46 @@ const CartPage = () => {
       setNewTable('');
     } else {
       alert('Please enter a valid table number (1-25)');
+    }
+  };
+
+  const handlePlaceOrder = async (paymentMethod) => {
+    if (!user) {
+      alert('Please log in to place an order');
+      return;
+    }
+
+    setPlacing(true);
+    try {
+      // Create order
+      const orderData = {
+        user_id: user.user_id,
+        table_id: tableNumber,
+        order_type: 'dine_in',
+        total_amount: total,
+        items: items.map(item => ({
+          item_id: item.id,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      };
+      const orderResponse = await api.post('/orders', orderData);
+      const order = orderResponse.data;
+
+      // Create payment
+      await api.post('/payments', {
+        order_id: order.order_id,
+        payment_mode: paymentMethod,
+        amount: total
+      });
+
+      clearCart();
+      navigate('/tracking');
+    } catch (error) {
+      console.error('Order failed:', error);
+      alert('Failed to place order. Please try again.');
+    } finally {
+      setPlacing(false);
     }
   };
 
@@ -73,7 +119,7 @@ const CartPage = () => {
       <div className="cart-summary">
         <strong>Total: {formatCurrency(total)}</strong>
       </div>
-      <PaymentForm />
+      <PaymentForm onPlaceOrder={handlePlaceOrder} total={total} placing={placing} />
     </div>
   );
 };

@@ -8,27 +8,25 @@ import CartPage from './pages/user/CartPage';
 import OrderTrackingPage from './pages/user/OrderTrackingPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminMenu from './pages/admin/AdminMenu';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
-import PrivateRoute from './components/PrivateRoute';
+import AdminMenu from './pages/admin/AdminMenu';
+import { PrivateRoute, AdminRoute } from './components/PrivateRoute';
 
 function App() {
   return (
     <Routes>
-      {/* User routes with bottom navigation */}
       <Route path="/" element={<UserLayout />}>
         <Route index element={<HomePage />} />
         <Route path="home" element={<HomePage />} />
         <Route path="menu" element={<MenuPage />} />
-        <Route path="cart" element={<CartPage />} />
-        <Route path="tracking" element={<OrderTrackingPage />} />
-        <Route path="profile" element={<ProfilePage />} />
+        <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+        <Route path="tracking" element={<PrivateRoute><OrderTrackingPage /></PrivateRoute>} />
+        <Route path="profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
       </Route>
 
-      {/* Admin routes protected */}
-      <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="customers" element={<AdminCustomers />} />
@@ -37,7 +35,6 @@ function App() {
         <Route path="menu" element={<AdminMenu />} />
       </Route>
 
-      {/* Redirect any unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

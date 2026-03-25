@@ -13,8 +13,8 @@ const MenuPage = () => {
 
   useEffect(() => {
     fetchMenu()
-      .then(res => {
-        setMenu(res.data);
+      .then(data => {
+        setMenu(data);
         setLoading(false);
       })
       .catch(err => {
@@ -23,6 +23,7 @@ const MenuPage = () => {
       });
   }, []);
 
+  const categories = [...new Set(menu.map(item => item.category))];
   const filteredItems = menu.filter(item => item.category === activeCategory);
 
   if (loading) return <LoadingSpinner />;
@@ -31,10 +32,14 @@ const MenuPage = () => {
   return (
     <div className="menu-page">
       <h2>Our Menu</h2>
-      <CategoryTabs activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+      <CategoryTabs 
+        categories={categories} 
+        activeCategory={activeCategory} 
+        onCategoryChange={setActiveCategory} 
+      />
       <div className="menu-grid">
         {filteredItems.map(item => (
-          <MenuItemCard key={item.id} item={item} />
+          <MenuItemCard key={item.item_id} item={item} />
         ))}
       </div>
     </div>

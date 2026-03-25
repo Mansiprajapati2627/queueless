@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 
 const LoginModal = ({ isOpen, onClose }) => {
   const { login, register } = useAuth();
-  const [mode, setMode] = useState('login'); // 'login' or 'signup'
+  const navigate = useNavigate();
+  const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -13,7 +15,6 @@ const LoginModal = ({ isOpen, onClose }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Close modal on escape key
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
@@ -57,7 +58,14 @@ const LoginModal = ({ isOpen, onClose }) => {
       if (mode === 'login') {
         const result = await login(email, password);
         if (result.success) {
+          const isAdmin = result.user?.role === 'admin';
           handleClose();
+          // Redirect based on role
+          if (isAdmin) {
+            navigate('/admin');
+          } else {
+            navigate('/profile');
+          }
         } else {
           setError(result.error || 'Login failed');
         }
@@ -67,7 +75,6 @@ const LoginModal = ({ isOpen, onClose }) => {
           setSuccessMessage('Registration successful! You can now log in.');
           setMode('login');
           setPassword('');
-          // Keep email prefilled
         } else {
           setError(result.error || 'Registration failed');
         }
@@ -93,16 +100,13 @@ const LoginModal = ({ isOpen, onClose }) => {
         <button className="modal-close" onClick={handleClose}>
           <X size={20} />
         </button>
-
         <div className="modal-header">
           <h2>{mode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
           <p>{mode === 'login' ? 'Login to your account' : 'Sign up to get started'}</p>
         </div>
-
         <form onSubmit={handleSubmit} className="modal-form">
           {error && <div className="modal-error">{error}</div>}
           {successMessage && <div className="modal-success">{successMessage}</div>}
-
           {mode === 'signup' && (
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
@@ -117,7 +121,6 @@ const LoginModal = ({ isOpen, onClose }) => {
               />
             </div>
           )}
-
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
@@ -130,7 +133,6 @@ const LoginModal = ({ isOpen, onClose }) => {
               disabled={isLoading}
             />
           </div>
-
           {mode === 'signup' && (
             <div className="form-group">
               <label htmlFor="phone">Phone (optional)</label>
@@ -144,7 +146,6 @@ const LoginModal = ({ isOpen, onClose }) => {
               />
             </div>
           )}
-
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -158,30 +159,23 @@ const LoginModal = ({ isOpen, onClose }) => {
               minLength={6}
             />
           </div>
-
           <button type="submit" className="modal-submit" disabled={isLoading}>
             {isLoading ? 'Please wait...' : mode === 'login' ? 'Login' : 'Sign Up'}
           </button>
         </form>
-
         <div className="modal-footer">
           {mode === 'login' ? (
             <p>
               Don't have an account?{' '}
-              <button onClick={toggleMode} className="modal-link">
-                Sign up
-              </button>
+              <button onClick={toggleMode} className="modal-link">Sign up</button>
             </p>
           ) : (
             <p>
               Already have an account?{' '}
-              <button onClick={toggleMode} className="modal-link">
-                Login
-              </button>
+              <button onClick={toggleMode} className="modal-link">Login</button>
             </p>
           )}
         </div>
-
         {mode === 'login' && (
           <div className="modal-demo">
             <p>Demo: admin@queueless.com / admin123</p>

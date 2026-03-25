@@ -1,28 +1,61 @@
-import React, { useState } from 'react';
-import { dummyCustomers } from '../../utils/dummyData';
+import React, { useEffect, useState } from 'react';
+import api from '../../services/api';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import { formatCurrency } from '../../utils/helpers';
-import { Search, Users, ShoppingBag, TrendingUp } from 'lucide-react';
+import { Search, Users, UserPlus } from 'lucide-react';
 
 const AdminCustomers = () => {
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('name'); // name, orders, spent
+  const [sortBy, setSortBy] = useState('name'); // name, email, joined
 
-  const filteredCustomers = dummyCustomers
-    .filter(c => 
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'orders') return b.orders - a.orders;
-      if (sortBy === 'spent') return b.totalSpent - a.totalSpent;
-      return 0;
-    });
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  const totalCustomers = dummyCustomers.length;
-  const totalOrders = dummyCustomers.reduce((sum, c) => sum + c.orders, 0);
-  const totalRevenue = dummyCustomers.reduce((sum, c) => sum + c.totalSpent, 0);
-  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  useEffect(() => {
+    filterAndSortUsers();
+  }, [users, searchTerm, sortBy]);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/users');
+      // Exclude admin users (role !== 'admin')
+      const customers = response.data.filter(user => user.role !== 'admin');
+      setUsers(customers);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterAndSortUsers = () => {
+    let filtered = [...users];
+
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Sorting
+    if (sortBy === 'name') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === 'email') {
+      filtered.sort((a, b) => a.email.localeCompare(b.email));
+    } else if (sortBy === 'joined') {
+      filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+
+    setFilteredUsers(filtered);
+  };
+
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="admin-customers">
@@ -31,15 +64,11 @@ const AdminCustomers = () => {
         <div className="customers-stats">
           <div className="stat">
             <Users size={20} />
-            <span>{totalCustomers} Total</span>
+            <span>{users.length} Total Customers</span>
           </div>
           <div className="stat">
-            <ShoppingBag size={20} />
-            <span>{totalOrders} Orders</span>
-          </div>
-          <div className="stat">
-            <TrendingUp size={20} />
-            <span>{formatCurrency(avgOrderValue)} Avg</span>
+            <UserPlus size={20} />
+            <span>Registered today: {users.filter(u => new Date(u.created_at).toDateString() === new Date().toDateString()).length}</span>
           </div>
         </div>
       </div>
@@ -58,39 +87,39 @@ const AdminCustomers = () => {
           <label>Sort by:</label>
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="name">Name</option>
-            <option value="orders">Orders</option>
-            <option value="spent">Total Spent</option>
+            <option value="email">Email</option>
+            <option value="joined">Joined (newest first)</option>
           </select>
         </div>
       </div>
 
       <div className="customers-table-container">
-        <table className="customers-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Orders</th>
-              <th>Total Spent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCustomers.length > 0 ? (
-              filteredCustomers.map(customer => (
-                <tr key={customer.id}>
-                  <td className="customer-name">{customer.name}</td>
-                  <td>{customer.email}</td>
-                  <td className="orders-count">{customer.orders}</td>
-                  <td className="spent-amount">{formatCurrency(customer.totalSpent)}</td>
-                </tr>
-              ))
-            ) : (
+        {filteredUsers.length > 0 ? (
+          <table className="customers-table">
+            <thead>
               <tr>
-                <td colSpan="4" className="no-results">No customers found</td>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+                <th>Role</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredUsers.map(user => (
+                <tr key={user.user_id}>
+                  <td className="customer-name">{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone || '—'}</td>
+                  <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                  <td><span className="role-badge user">{user.role}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="no-results">No customers found</div>
+        )}
       </div>
     </div>
   );

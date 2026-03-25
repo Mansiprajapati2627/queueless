@@ -3,33 +3,22 @@ import React, { createContext, useState, useContext, useMemo, useEffect } from '
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // Initialize tableNumber from URL query parameter
-  const getInitialTable = () => {
+  const [tableNumber, setTableNumber] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const tableParam = params.get('table');
     return tableParam ? parseInt(tableParam, 10) : null;
-  };
-
-  const [tableNumber, setTableNumber] = useState(getInitialTable());
+  });
   const [items, setItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState(null);
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cartItems');
     if (savedCart) setItems(JSON.parse(savedCart));
   }, []);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(items));
   }, [items]);
-
-  // Save table number to localStorage (optional)
-  useEffect(() => {
-    if (tableNumber) localStorage.setItem('tableNumber', tableNumber);
-    else localStorage.removeItem('tableNumber');
-  }, [tableNumber]);
 
   const addItem = (menuItem) => {
     setItems(prev => {

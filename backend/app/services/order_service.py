@@ -1,6 +1,37 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.models.order_model import Order, OrderItem
 from app.schemas.order_schema import OrderCreate, OrderUpdateStatus
+from app.models.menu_model import Menu
+
+def get_orders(db: Session, skip: int = 0, limit: int = 100):
+    orders = db.query(Order).options(
+        joinedload(Order.items).joinedload(OrderItem.menu_item)
+    ).offset(skip).limit(limit).all()
+
+    # Attach item_name to each order item
+    for order in orders:
+        for item in order.items:
+            item.item_name = item.menu_item.item_name if item.menu_item else f"Item {item.item_id}"
+    return orders
+
+def get_orders_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 100):
+    orders = db.query(Order).options(
+        joinedload(Order.items).joinedload(OrderItem.menu_item)
+    ).filter(Order.user_id == user_id).offset(skip).limit(limit).all()
+
+    for order in orders:
+        for item in order.items:
+            item.item_name = item.menu_item.item_name if item.menu_item else f"Item {item.item_id}"
+    return orders
+
+def get_order(db: Session, order_id: int):
+    order = db.query(Order).options(
+        joinedload(Order.items).joinedload(OrderItem.menu_item)
+    ).filter(Order.order_id == order_id).first()
+    if order:
+        for item in order.items:
+            item.item_name = item.menu_item.item_name if item.menu_item else f"Item {item.item_id}"
+    return order
 
 def create_order(db: Session, order: OrderCreate):
     db_order = Order(
@@ -23,12 +54,6 @@ def create_order(db: Session, order: OrderCreate):
     db.commit()
     db.refresh(db_order)
     return db_order
-
-def get_order(db: Session, order_id: int):
-    return db.query(Order).filter(Order.order_id == order_id).first()
-
-def get_orders(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Order).offset(skip).limit(limit).all()
 
 def update_order_status(db: Session, order_id: int, status_update: OrderUpdateStatus):
     db_order = db.query(Order).filter(Order.order_id == order_id).first()

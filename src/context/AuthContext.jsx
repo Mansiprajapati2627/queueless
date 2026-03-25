@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
-
-const API_BASE_URL = 'http://127.0.0.1:8000';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -9,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
-  // Fetch user info if token exists
+  // Fetch user on mount / token change
   useEffect(() => {
     const fetchUser = async () => {
       if (!token) {
@@ -17,19 +16,12 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          // Token invalid/expired – clear it
-          localStorage.removeItem('token');
-          setToken(null);
-        }
+        const response = await api.get('/users/me');
+        setUser(response.data);
       } catch (error) {
         console.error('Failed to fetch user:', error);
+        localStorage.removeItem('token');
+        setToken(null);
       } finally {
         setLoading(false);
       }
@@ -42,61 +34,27 @@ export const AuthProvider = ({ children }) => {
       const formData = new FormData();
       formData.append('username', email);
       formData.append('password', password);
-
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        body: formData,
+      const response = await api.post('/auth/login', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Login failed');
-      }
-
-      const data = await response.json();
-      localStorage.setItem('token', data.access_token);
-      setToken(data.access_token);
-
-      // Fetch user details
-      const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${data.access_token}` },
-      });
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        setUser(userData);
-        return { success: true };
-      } else {
-        throw new Error('Failed to fetch user details');
-      }
+      const { access_token } = response.data;
+      localStorage.setItem('token', access_token);
+      setToken(access_token);
+      const userResponse = await api.get('/users/me');
+      const userData = userResponse.data;
+      setUser(userData);
+      return { success: true, user: userData };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: error.response?.data?.detail || error.message };
     }
   };
 
   const register = async (name, email, password, phone = '') => {
     try {
-      const payload = {
-        name,
-        email,
-        phone,
-        password,
-        role: 'user',
-      };
-
-      const response = await fetch(`${API_BASE_URL}/users/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Registration failed');
-      }
-
+      await api.post('/users/register', { name, email, phone, password, role: 'user' });
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: error.response?.data?.detail || error.message };
     }
   };
 

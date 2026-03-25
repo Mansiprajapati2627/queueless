@@ -1,15 +1,19 @@
 import axios from 'axios';
 
-// Mock axios instance – in real app baseURL would point to server
 const api = axios.create({
-  baseURL: 'https://api.example.com',
-  timeout: 1000,
+  baseURL: 'http://127.0.0.1:8000', // your backend URL
 });
 
-// Simulate delay for mock responses
-api.interceptors.response.use(async (response) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return response;
-});
+// Attach token to every request if it exists
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default api;

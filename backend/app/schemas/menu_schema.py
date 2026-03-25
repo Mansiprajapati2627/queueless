@@ -5,6 +5,7 @@ class MenuBase(BaseModel):
     item_name: str
     description: str | None = None
     price: float
+    category: str                          # NEW
     image_url: str | None = None
     availability: bool = True
 
@@ -15,6 +16,7 @@ class MenuUpdate(BaseModel):
     item_name: str | None = None
     description: str | None = None
     price: float | None = None
+    category: str | None = None            # NEW
     image_url: str | None = None
     availability: bool | None = None
 
