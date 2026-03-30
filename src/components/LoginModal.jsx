@@ -164,11 +164,11 @@ const LoginModal = ({ isOpen, onClose }) => {
           </button>
         </form>
         <div className="modal-footer">
-          {mode === 'login' ? (
-            <p>
-              Don't have an account?{' '}
-              <button onClick={toggleMode} className="modal-link">Sign up</button>
-            </p>
+             {mode === 'login' ? (
+              <p className="center-text">
+               Don't have an account?{' '}
+               <button onClick={toggleMode} className="modal-link">Sign up</button>
+              </p>
           ) : (
             <p>
               Already have an account?{' '}
@@ -178,7 +178,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         </div>
         {mode === 'login' && (
           <div className="modal-demo">
-            <p>Demo: admin@queueless.com / admin123</p>
+          
           </div>
         )}
       </div>
