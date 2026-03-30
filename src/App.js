@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
 import HomePage from './pages/user/HomePage';
-import MenuPage from './pages/user/MenuPage.jsx';
+import MenuPage from './pages/user/MenuPage';
 import CartPage from './pages/user/CartPage';
 import OrderTrackingPage from './pages/user/OrderTrackingPage';
 import ProfilePage from './pages/user/ProfilePage';
