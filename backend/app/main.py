@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from app.config.database import engine, Base
+from app import models
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import (
     auth_routes,
@@ -13,6 +15,7 @@ from app.config.database import engine, Base
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="QueueLess Backend")
+Base.metadata.create_all(bind=engine)
 
 # CORS configuration – allow your frontend origin
 from fastapi.middleware.cors import CORSMiddleware
