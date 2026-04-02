@@ -1,43 +1,61 @@
-import os
-import sys
-from pathlib import Path
-
-# Add the parent directory to the path so we can import from app
-sys.path.append(str(Path(__file__).parent))
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.models.user_model import User
-from app.models.table_model import DiningTable
-from app.models.menu_model import Menu
-from app.utils.auth import get_password_hash
+# backend/seed_db.py (standalone)
 import random
+from sqlalchemy import create_engine, Column, Integer, String, Enum, DECIMAL, Boolean, TIMESTAMP, ForeignKey, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from passlib.context import CryptContext
 
 # ==================== CONFIGURATION ====================
-# Use the EXTERNAL connection string from your Render PostgreSQL database
+# Use your Render PostgreSQL EXTERNAL connection string
 DATABASE_URL = "postgresql://queueless_lb7c_user:WLiyTYW8JWcxnuM8fP2WJ1lb6kHH5UXA@dpg-d76ab2vpm1nc7391u2tg-a.oregon-postgres.render.com/queueless_lb7c"
 
-# ==================== INITIAL DATA ====================
+# Create engine and session
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-# 1. Admin user
-admin_data = {
-    "name": "Admin",
-    "email": "admin@queueless.com",
-    "phone": "1234567890",
-    "password": get_password_hash("admin123"),
-    "role": "admin"
-}
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def get_password_hash(password):
+    return pwd_context.hash(password)
 
-# 2. Tables (1 to 25)
-table_numbers = list(range(1, 26))
+# ==================== MODELS ====================
+# We need to define minimal models for seeding
+# (or we can import from app.models but that would require the app to be set up)
+# For simplicity, we'll define them here. But to avoid duplication, you could import if the app's modules are available.
+# However, since we had import errors, we'll define the necessary tables manually.
 
-# 3. Menu items (your existing dummy data, but in Python)
-# Helper for random price (in INR)
+class User(Base):
+    __tablename__ = "users"
+    user_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    phone = Column(String(15), nullable=False)
+    password = Column(String(255), nullable=False)
+    role = Column(Enum('admin', 'user', name='user_role_enum'), nullable=False)
+    created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
+
+class DiningTable(Base):
+    __tablename__ = "tables"
+    table_id = Column(Integer, primary_key=True, index=True)
+    table_number = Column(Integer, unique=True, nullable=False)
+
+class Menu(Base):
+    __tablename__ = "menu"
+    item_id = Column(Integer, primary_key=True, index=True)
+    item_name = Column(String(100), nullable=False)
+    description = Column(Text)
+    price = Column(DECIMAL(10,2), nullable=False)
+    category = Column(String(50), nullable=False)
+    image_url = Column(String(255))
+    availability = Column(Boolean, default=True)
+    created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
+
+# ==================== DATA ====================
 def random_price(min_val, max_val):
     return round(random.uniform(min_val, max_val), 2)
 
-# Image paths (same as in your dummyData.js)
-# Note: these are relative to the frontend's public folder
+# Image map (same as before)
 image_map = {
     "Snacks": [
         "/assets/Snacks/maggie.jpg",
@@ -147,7 +165,7 @@ def get_image_for_category(category, index):
     images = image_map.get(category, image_map["Snacks"])
     return images[index % len(images)]
 
-# Category lists (as in your dummyData.js)
+# Category lists
 snacks = [
     "Maggie", "Masala Maggi", "Cheese Maggi",
     "Steamed Momos", "Fried Momos", "Kurkure Momos",
@@ -193,7 +211,6 @@ desserts = [
     "Chocolate Pastry", "Chocolate Fudge Pastry", "Choco Chip Pastry"
 ]
 
-# Build full menu list
 menu_items = []
 
 # Snacks
@@ -240,40 +257,38 @@ for idx, name in enumerate(desserts):
         "availability": True
     })
 
-# ==================== SEED FUNCTION ====================
-
 def seed_database():
     print("Connecting to database...")
-    engine = create_engine(DATABASE_URL)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
     try:
-        # Create tables if not exist (optional, but safe)
-        # Uncomment if you need to create tables, but they should already exist via backend startup.
-        # from app.config.database import Base
-        # Base.metadata.create_all(bind=engine)
-
-        # 1. Insert admin user
-        existing_admin = db.query(User).filter(User.email == admin_data["email"]).first()
+        # 1. Admin user
+        existing_admin = db.query(User).filter(User.email == "admin@queueless.com").first()
         if not existing_admin:
-            admin = User(**admin_data)
+            admin = User(
+                name="Admin",
+                email="admin@queueless.com",
+                phone="1234567890",
+                password=get_password_hash("admin123"),
+                role="admin"
+            )
             db.add(admin)
             print("Admin user created.")
         else:
             print("Admin user already exists.")
 
-        # 2. Insert tables 1-25
-        existing_tables = db.query(DiningTable).all()
+        # 2. Tables 1-25
+        existing_tables = db.query(DiningTable).first()
         if not existing_tables:
-            for num in table_numbers:
+            for num in range(1, 26):
                 table = DiningTable(table_number=num)
                 db.add(table)
-            print(f"{len(table_numbers)} tables created.")
+            print("25 tables created.")
         else:
             print("Tables already exist.")
 
-        # 3. Insert menu items
+        # 3. Menu items
         existing_items = db.query(Menu).first()
         if not existing_items:
             for item in menu_items:
