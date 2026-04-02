@@ -10,5 +10,5 @@ class User(Base):
     email = Column(String(100), unique=True, nullable=False)
     phone = Column(String(15), nullable=False)
     password = Column(String(255), nullable=False)
-    role = Column(Enum('admin', 'user'), nullable=False)
+    role = Column(Enum('admin', 'user', name='user_role_enum'), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
