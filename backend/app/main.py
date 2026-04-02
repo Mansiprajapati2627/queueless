@@ -5,15 +5,13 @@ import os
 from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
 from app.config.database import engine, Base
 
-# Create database tables
+# Create DB tables
 Base.metadata.create_all(bind=engine)
 
-# Initialize app
 app = FastAPI(title="QueueLess Backend")
 
-# ------------------ CORS CONFIG ------------------
+# ------------------ CORS ------------------
 
-# Get allowed origins from environment variable
 origins = os.getenv(
     "ALLOWED_ORIGINS",
     "http://localhost:3000,https://queueless-frontend-84br.onrender.com"
@@ -21,7 +19,7 @@ origins = os.getenv(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,   # Allowed frontend URLs
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
