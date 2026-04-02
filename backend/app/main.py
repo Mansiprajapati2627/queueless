@@ -18,8 +18,9 @@ app = FastAPI(title="QueueLess Backend")
 Base.metadata.create_all(bind=engine)
 
 # CORS configuration – allow your frontend origin
+import os
 from fastapi.middleware.cors import CORSMiddleware
-
+origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
    allow_origins=["*"],
