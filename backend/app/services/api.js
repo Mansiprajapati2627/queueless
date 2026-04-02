@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000', // or 'http://localhost:8000' – pick the one that worked in the console test
-  timeout: 10000, // 10 seconds timeout
+ // timeout: 10000, // 10 seconds timeout
 });
 
 // Add a request interceptor to include the token if available

@@ -7,7 +7,7 @@ from app.models.user_model import User
 
 router = APIRouter()
 
-# Public endpoints (no authentication)
+# Public endpoints
 @router.get("/", response_model=list[MenuResponse])
 def read_menu_items(
     skip: int = 0,
@@ -27,7 +27,7 @@ def read_menu_item(
         raise HTTPException(status_code=404, detail="Item not found")
     return db_item
 
-# Admin only endpoints (require authentication and admin role)
+# Admin only endpoints
 @router.post("/", response_model=MenuResponse)
 def create_menu_item(
     item: MenuCreate,

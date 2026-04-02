@@ -1,25 +1,14 @@
 from fastapi import FastAPI
-from app.config.database import engine, Base
-from app import models
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import (
-    auth_routes,
-    user_routes,
-    table_routes,
-    menu_routes,
-    order_routes,
-    payment_routes,
-)
+import os
+from app.routes import auth_routes, user_routes, menu_routes  # <-- add menu_routes
 from app.config.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="QueueLess Backend")
-Base.metadata.create_all(bind=engine)
 
-# CORS configuration – allow your frontend origin
-import os
-from fastapi.middleware.cors import CORSMiddleware
+# CORS
 origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 app.add_middleware(
     CORSMiddleware,
@@ -29,12 +18,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
-app.include_router(table_routes.router, prefix="/tables", tags=["Tables"])
-app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
-app.include_router(order_routes.router, prefix="/orders", tags=["Orders"])
-app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
+app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])   # <-- this is missing
 
 @app.get("/")
 def root():
