@@ -1,10 +1,17 @@
-# backend/seed_db.py
-
 import os
+import sys
+from pathlib import Path
+
+# Add the parent directory to the path so we can import from app
+sys.path.append(str(Path(__file__).parent))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import User, DiningTable, Menu
+from app.models.user_model import User
+from app.models.table_model import DiningTable
+from app.models.menu_model import Menu
 from app.utils.auth import get_password_hash
+import random
 
 # ==================== CONFIGURATION ====================
 # Use the EXTERNAL connection string from your Render PostgreSQL database
@@ -26,8 +33,6 @@ table_numbers = list(range(1, 26))
 
 # 3. Menu items (your existing dummy data, but in Python)
 # Helper for random price (in INR)
-import random
-
 def random_price(min_val, max_val):
     return round(random.uniform(min_val, max_val), 2)
 
@@ -245,8 +250,9 @@ def seed_database():
 
     try:
         # Create tables if not exist (optional, but safe)
-        from app.models import Base
-        Base.metadata.create_all(bind=engine)
+        # Uncomment if you need to create tables, but they should already exist via backend startup.
+        # from app.config.database import Base
+        # Base.metadata.create_all(bind=engine)
 
         # 1. Insert admin user
         existing_admin = db.query(User).filter(User.email == admin_data["email"]).first()
