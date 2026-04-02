@@ -58,7 +58,7 @@ def random_price(min_val, max_val):
 # Image map (same as before)
 image_map = {
     "Snacks": [
-        '/assets/Snacks/maggie.jpg',
+      '/assets/Snacks/maggie.jpg',
       '/assets/Snacks/Masalamaggie.jpg', 
       '/assets/Snacks/cheesemaggie.jpg',
       '/assets/Snacks/steamedmomos.jpg',
@@ -85,7 +85,7 @@ image_map = {
       '/assets/Snacks/grilledsandwich.jpg',
     ],
     "Meals": [
-       '/assets/Meals/Margheritapizza.jpg',
+    '/assets/Meals/Margheritapizza.jpg',
       '/assets/Meals/7cheesepizza.jpg',
       '/assets/Meals/veggiesupremepizza.jpg',
       '/assets/Meals/pepperonipizza.jpg',
@@ -112,7 +112,7 @@ image_map = {
       '/assets/Meals/alooparatha.jpg',
     ],
     "Beverages": [
-        '/assets/Beverages/chai.jpg',
+      '/assets/Beverages/chai.jpg',
       '/assets/Beverages/masalachai.jpg',
       '/assets/Beverages/greentea.jpg',
       '/assets/Beverages/Blackcoffee.jpg',
@@ -140,7 +140,7 @@ image_map = {
       '/assets/Beverages/water.jpg',
     ],
     "Desserts": [
-       '/assets/Desserts/chocolatebrownie.jpg',
+    '/assets/Desserts/chocolatebrownie.jpg',
       '/assets/Desserts/cheesecake.jpg',
       '/assets/Desserts/tiramisu.jpg',
       '/assets/Desserts/pudding.jpg',
