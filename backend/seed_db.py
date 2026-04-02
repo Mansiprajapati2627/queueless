@@ -58,7 +58,7 @@ def random_price(min_val, max_val):
 # Image map (same as before)
 image_map = {
     "Snacks": [
-      '/assets/Snacks/Maggie.jpg',
+      'public/assets/Snacks/Maggie.jpg',
       '/assets/Snacks/Masalamaggie.jpg', 
       '/assets/Snacks/cheesemaggie.jpg',
       '/assets/Snacks/steamedmomos.jpg',
