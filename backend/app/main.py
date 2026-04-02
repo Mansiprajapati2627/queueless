@@ -28,6 +28,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.routes import menu_routes
+app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
 # ------------------ ROUTES ------------------
 
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
