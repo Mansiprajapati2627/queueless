@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, Enum, DECIMAL, TIMESTAMP, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.config.database import Base
+from app.models.table_model import DiningTable
 
 class Order(Base):
     __tablename__ = "orders"

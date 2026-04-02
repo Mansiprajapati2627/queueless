@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
-
+  
 from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
 from app.config.database import engine, Base
+
+from app.models import user_model, menu_model, order_model, payment_model
+from app.models import table_model
 
 # Create DB tables
 Base.metadata.create_all(bind=engine)
