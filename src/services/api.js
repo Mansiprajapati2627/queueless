@@ -6,7 +6,6 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
 });
-
 // Add token to every request if available
 api.interceptors.request.use(
   (config) => {
