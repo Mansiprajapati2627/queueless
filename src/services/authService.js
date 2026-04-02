@@ -1,16 +1,15 @@
 import api from './api';
 
-// Mock login – no actual API call
-export const login = (email, password) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (email === 'admin@queueless.com' && password === 'admin123') {
-        resolve({ user: { email, role: 'admin' }, token: 'mock-token' });
-      } else if (email && password) {
-        resolve({ user: { email, role: 'customer' }, token: 'mock-token' });
-      } else {
-        resolve(null);
-      }
-    }, 500);
-  });
+export const login = async (email, password) => {
+  const response = await api.post('/auth/login/', { email, password });
+  return response.data;
+};
+
+export const register = async (userData) => {
+  const response = await api.post('/auth/register/', userData);
+  return response.data;
+};
+
+export const logout = () => {
+  localStorage.removeItem('token');
 };

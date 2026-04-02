@@ -37,7 +37,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await api.get('/menu');
+        const response = await api.get('/menu/');
         setMenuItems(response.data);
       } catch (error) {
         console.error('Failed to fetch menu:', error);

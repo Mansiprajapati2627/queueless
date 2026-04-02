@@ -1,18 +1,21 @@
 import api from './api';
-import { dummyOrders } from '../utils/dummyData';
 
-export const fetchOrders = () => {
-  return Promise.resolve({ data: dummyOrders });
+export const fetchOrders = async () => {
+  const response = await api.get('/orders/');
+  return response.data;
 };
 
-export const createOrder = (order) => {
-  const newOrder = { id: Date.now().toString(), ...order, createdAt: new Date() };
-  dummyOrders.push(newOrder);
-  return Promise.resolve({ data: newOrder });
+export const fetchOrdersByUser = async (userId) => {
+  const response = await api.get(`/orders/user/${userId}/`);
+  return response.data;
 };
 
-export const updateOrderStatus = (orderId, status) => {
-  const order = dummyOrders.find(o => o.id === orderId);
-  if (order) order.status = status;
-  return Promise.resolve({ data: order });
+export const createOrder = async (order) => {
+  const response = await api.post('/orders/', order);
+  return response.data;
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  const response = await api.put(`/orders/${orderId}/`, { order_status: status });
+  return response.data;
 };
