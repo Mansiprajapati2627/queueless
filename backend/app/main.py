@@ -8,7 +8,7 @@ from app.config.database import engine, Base
 # Create DB tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="QueueLess Backend")
+app = FastAPI(title="QueueLess Backend", redirect_slashes=False)
 
 # ------------------ CORS ------------------
 

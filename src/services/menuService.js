@@ -1,7 +1,7 @@
 import api from './api';
 
 export const fetchMenu = async () => {
-  const response = await api.get('/menu');
+  const response = await api.get('/menu/');        // ✅ added /
   return response.data;
 };
 
@@ -12,15 +12,15 @@ export const fetchCategories = async () => {
 };
 
 export const createMenuItem = async (itemData) => {
-  const response = await api.post('/menu', itemData);
+  const response = await api.post('/menu/', itemData);  // ✅ added /
   return response.data;
 };
 
 export const updateMenuItem = async (id, itemData) => {
-  const response = await api.put(`/menu/${id}`, itemData);
+  const response = await api.put(`/menu/${id}/`, itemData);  // ✅ added /
   return response.data;
 };
 
 export const deleteMenuItem = async (id) => {
-  await api.delete(`/menu/${id}`);
+  await api.delete(`/menu/${id}/`);   // ✅ added /
 };
