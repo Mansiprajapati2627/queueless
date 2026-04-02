@@ -1,10 +1,13 @@
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // your backend URL
+  baseURL: API_BASE_URL,
+  timeout: 10000,
 });
 
-// Attach token to every request if it exists
+// Add token to every request if available
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
