@@ -7,7 +7,7 @@ const randomPrice = (min, max) => {
 const getImageForCategory = (category, index) => {
   const imageMap = {
     Snacks: [
-      '/assets/Snacks/maggie.jpg',
+      '/assets/Snacks/Maggie.jpg',
       '/assets/Snacks/Masalamaggie.jpg', // fixed typo: "assests" -> "assets"
       '/assets/Snacks/cheesemaggie.jpg',
       '/assets/Snacks/steamedmomos.jpg',
