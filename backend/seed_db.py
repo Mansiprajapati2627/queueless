@@ -85,7 +85,7 @@ image_map = {
       '/assets/Snacks/grilledsandwich.jpg',
     ],
     "Meals": [
-    '/assets/Meals/Margheritapizza.jpg',
+      '/assets/Meals/Margheritapizza.jpg',
       '/assets/Meals/7cheesepizza.jpg',
       '/assets/Meals/veggiesupremepizza.jpg',
       '/assets/Meals/pepperonipizza.jpg',
