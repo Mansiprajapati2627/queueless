@@ -7,8 +7,7 @@ from passlib.context import CryptContext
 
 # ==================== CONFIGURATION ====================
 # Use your Render PostgreSQL EXTERNAL connection string
-DATABASE_URL = "postgresql://queueless_lb7c_user:WLiyTYW8JWcxnuM8fP2WJ1lb6kHH5UXA@dpg-d76ab2vpm1nc7391u2tg-a.oregon-postgres.render.com/queueless_lb7c"
-
+DATABASE_URL = "mysql+pymysql://ut7miydq9bocbo3w:BzHjPpTjFg9vmpVsuJcvd@bmosjbcrxoncno5vlx1s-mysql.services.clever-cloud.com:3306/bmosjbcrxoncno5vlx1s"
 # Create engine and session
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
