@@ -44,6 +44,13 @@ def fix_admin_password():
 @app.get("/debug-auth")
 def debug_auth(db: Session = Depends(get_db)):
     try:
+        # Rehash admin password if needed
+        admin = db.query(User).filter(User.email == "admin@queueless.com").first()
+        if admin:
+            # Rehash regardless (safe to do once)
+            admin.password = get_password_hash("admin123")
+            db.commit()
+            print("Admin password rehashed")
         users = db.query(User).limit(1).all()
         user = authenticate_user(db, "admin@queueless.com", "admin123")
         return {
