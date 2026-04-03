@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
 from app.config.database import engine, Base
 from app.utils.auth import get_db, authenticate_user
-from app.models.user_model import User   # <-- add this import
+from app.models.user_model import User
+from app.utils.auth import get_password_hash
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +29,17 @@ app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
 app.include_router(order_routes.router, prefix="/orders", tags=["Orders"])
 app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
+
+# Temporary endpoint to rehash admin password – REMOVE AFTER USE
+@app.get("/fix-password")
+def fix_admin_password():
+    db = next(get_db())
+    admin = db.query(User).filter(User.email == "admin@queueless.com").first()
+    if not admin:
+        return {"error": "Admin user not found"}
+    admin.password = get_password_hash("admin123")
+    db.commit()
+    return {"message": "Admin password rehashed successfully"}
 
 @app.get("/debug-auth")
 def debug_auth(db: Session = Depends(get_db)):
