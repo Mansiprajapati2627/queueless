@@ -71,6 +71,7 @@ def cors_test():
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
+
 @app.get("/run-sql")
 def run_sql(sql: str, db: Session = Depends(get_db)):
     try:
