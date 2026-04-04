@@ -14,10 +14,7 @@ app = FastAPI(title="QueueLess Backend")
 # CORS – MUST be the first middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://queueless-frontend-84br.onrender.com",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,3 +66,7 @@ def root():
 @app.get("/cors-test")
 def cors_test():
     return {"message": "CORS works"}
+
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}
