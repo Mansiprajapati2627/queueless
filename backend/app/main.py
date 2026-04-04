@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.config.database import engine, Base
 from app.utils.auth import get_db
 from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
@@ -32,17 +33,17 @@ app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 @app.get("/init-tables")
 def init_tables(db: Session = Depends(get_db)):
     try:
-        # Ensure the tables table exists (should already, but safe)
-        db.execute("""
+        # Ensure the tables table exists
+        db.execute(text("""
             CREATE TABLE IF NOT EXISTS tables (
                 table_id INT AUTO_INCREMENT PRIMARY KEY,
                 table_number INT NOT NULL UNIQUE
             )
-        """)
+        """))
         db.commit()
-        # Insert numbers 1-25
+        # Insert numbers 1-25, ignoring duplicates
         for i in range(1, 26):
-            db.execute("INSERT INTO tables (table_number) VALUES (:num) ON DUPLICATE KEY UPDATE table_number = table_number", {"num": i})
+            db.execute(text("INSERT IGNORE INTO tables (table_number) VALUES (:num)"), {"num": i})
         db.commit()
         return {"message": "Tables 1-25 inserted successfully"}
     except Exception as e:
