@@ -31,3 +31,10 @@ app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 @app.get("/")
 def root():
     return {"message": "Welcome to QueueLess API"}
+
+@app.post("/test-order")
+def test_order(db: Session = Depends(get_db)):
+    from app.schemas.order_schema import OrderCreate, OrderItemCreate
+    items = [OrderItemCreate(item_id=1, quantity=1, price=100.0)]
+    order = OrderCreate(user_id=1, table_id=3, order_type='dine_in', total_amount=100.0, items=items)
+    return order_service.create_order(db, order)

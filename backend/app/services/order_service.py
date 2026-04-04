@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from app.models.order_model import Order, OrderItem
 from app.schemas.order_schema import OrderCreate, OrderUpdateStatus
-from app.models.menu_model import Menu
 
 def get_orders(db: Session, skip: int = 0, limit: int = 100):
     orders = db.query(Order).options(

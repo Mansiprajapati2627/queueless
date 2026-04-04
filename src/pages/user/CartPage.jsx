@@ -48,6 +48,7 @@ const CartPage = () => {
           price: item.price
         }))
       };
+      console.log('Sending order data:', orderData);
       const orderResponse = await api.post('/orders', orderData);
       const order = orderResponse.data;
 
@@ -62,7 +63,13 @@ const CartPage = () => {
       navigate('/tracking');
     } catch (error) {
       console.error('Order failed:', error);
-      alert('Failed to place order. Please try again.');
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Status:', error.response.status);
+        alert(`Order failed: ${error.response.data.detail || error.response.data.message || 'Please try again.'}`);
+      } else {
+        alert('Failed to place order. Please try again.');
+      }
     } finally {
       setPlacing(false);
     }
