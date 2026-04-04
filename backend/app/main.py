@@ -66,6 +66,6 @@ def debug_auth(db: Session = Depends(get_db)):
 def root():
     return {"message": "Welcome to QueueLess API"}
 
-@app.get("/test")
-def test():
+@app.get("/cors-test")
+def cors_test():
     return {"message": "CORS works"}
