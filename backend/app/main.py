@@ -1,16 +1,12 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from app.config.database import engine, Base
-from app.utils.auth import get_db
 from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
+from app.config.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="QueueLess Backend")
 
-# CORS – allow your frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -22,32 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
 app.include_router(order_routes.router, prefix="/orders", tags=["Orders"])
 app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
-
-# Temporary endpoint to insert tables 1-25 – REMOVE AFTER USE
-@app.get("/init-tables")
-def init_tables(db: Session = Depends(get_db)):
-    try:
-        # Ensure the tables table exists
-        db.execute(text("""
-            CREATE TABLE IF NOT EXISTS tables (
-                table_id INT AUTO_INCREMENT PRIMARY KEY,
-                table_number INT NOT NULL UNIQUE
-            )
-        """))
-        db.commit()
-        # Insert numbers 1-25, ignoring duplicates
-        for i in range(1, 26):
-            db.execute(text("INSERT IGNORE INTO tables (table_number) VALUES (:num)"), {"num": i})
-        db.commit()
-        return {"message": "Tables 1-25 inserted successfully"}
-    except Exception as e:
-        return {"error": str(e)}
 
 @app.get("/")
 def root():

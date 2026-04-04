@@ -4,21 +4,13 @@ from app.services import order_service
 from app.schemas.order_schema import OrderCreate, OrderResponse, OrderUpdateStatus
 from app.utils.auth import get_db, get_current_active_user, get_current_admin_user
 from app.models.user_model import User
-import traceback
 
 router = APIRouter(redirect_slashes=False)
 
 @router.post("/", response_model=OrderResponse)
 def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    try:
-        order.user_id = current_user.user_id
-        return order_service.create_order(db, order)
-    except Exception as e:
-        print("="*50)
-        print("ERROR CREATING ORDER:")
-        traceback.print_exc()
-        print("="*50)
-        raise HTTPException(status_code=500, detail=str(e))
+    order.user_id = current_user.user_id
+    return order_service.create_order(db, order)
 
 @router.get("/", response_model=list[OrderResponse])
 def read_orders(
