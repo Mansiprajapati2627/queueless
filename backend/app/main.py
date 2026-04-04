@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers (all with redirect_slashes=False – we'll set in each router)
+# Include routers (all with redirect_slashes=False)
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])

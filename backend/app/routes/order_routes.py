@@ -19,7 +19,6 @@ def read_orders(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    # Admin sees all orders; regular users see only their own
     if current_user.role == "admin":
         orders = order_service.get_orders(db, skip=skip, limit=limit)
     else:
@@ -27,15 +26,10 @@ def read_orders(
     return orders
 
 @router.get("/{order_id}", response_model=OrderResponse)
-def read_order(
-    order_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
-):
+def read_order(order_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     db_order = order_service.get_order(db, order_id)
     if not db_order:
         raise HTTPException(status_code=404, detail="Order not found")
-    # Check permissions
     if current_user.role != "admin" and db_order.user_id != current_user.user_id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return db_order
@@ -45,7 +39,7 @@ def update_order_status(
     order_id: int,
     status_update: OrderUpdateStatus,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),  # admin only
+    admin: User = Depends(get_current_admin_user),
 ):
     db_order = order_service.update_order_status(db, order_id, status_update)
     if not db_order:

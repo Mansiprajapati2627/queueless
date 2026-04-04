@@ -7,8 +7,6 @@ def get_orders(db: Session, skip: int = 0, limit: int = 100):
     orders = db.query(Order).options(
         joinedload(Order.items).joinedload(OrderItem.menu_item)
     ).offset(skip).limit(limit).all()
-
-    # Attach item_name to each order item
     for order in orders:
         for item in order.items:
             item.item_name = item.menu_item.item_name if item.menu_item else f"Item {item.item_id}"
@@ -18,7 +16,6 @@ def get_orders_by_user(db: Session, user_id: int, skip: int = 0, limit: int = 10
     orders = db.query(Order).options(
         joinedload(Order.items).joinedload(OrderItem.menu_item)
     ).filter(Order.user_id == user_id).offset(skip).limit(limit).all()
-
     for order in orders:
         for item in order.items:
             item.item_name = item.menu_item.item_name if item.menu_item else f"Item {item.item_id}"
@@ -42,7 +39,6 @@ def create_order(db: Session, order: OrderCreate):
     )
     db.add(db_order)
     db.flush()
-
     for item in order.items:
         db_item = OrderItem(
             order_id=db_order.order_id,
