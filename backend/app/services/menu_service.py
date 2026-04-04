@@ -2,12 +2,11 @@ from sqlalchemy.orm import Session
 from app.models.menu_model import Menu
 from app.schemas.menu_schema import MenuCreate, MenuUpdate
 
-
 def get_menu_items(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Menu).offset(skip).limit(limit).all()
 
-def get_menu_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Menu).offset(skip).limit(limit).all()
+def get_menu_item(db: Session, item_id: int):
+    return db.query(Menu).filter(Menu.item_id == item_id).first()
 
 def create_menu_item(db: Session, item: MenuCreate):
     db_item = Menu(**item.model_dump())

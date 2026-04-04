@@ -8,6 +8,11 @@ class UserCreate(BaseModel):
     role: str
     password: str
 
+class UserUpdate(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    password: str | None = None
+
 class UserResponse(BaseModel):
     user_id: int
     name: str
