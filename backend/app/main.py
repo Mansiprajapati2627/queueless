@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
+from sqlalchemy.orm import Session
 from app.config.database import engine, Base
+from app.utils.auth import get_db
+from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,17 +21,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers – all have redirect_slashes=False
+# Include routers
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
 app.include_router(order_routes.router, prefix="/orders", tags=["Orders"])
 app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 
+# Temporary endpoint to insert tables 1-25 (remove after use)
+@app.get("/init-tables")
+def init_tables(db: Session = Depends(get_db)):
+    for i in range(1, 26):
+        db.execute("INSERT IGNORE INTO tables (table_number) VALUES (:num)", {"num": i})
+    db.commit()
+    return {"message": "Tables 1-25 inserted"}
+
 @app.get("/")
 def root():
     return {"message": "Welcome to QueueLess API"}
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}

@@ -14,7 +14,6 @@ SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 if not SQLALCHEMY_DATABASE_URL:
     raise Exception("DATABASE_URL environment variable not set")
 
-# Limit connection pool to stay within free MySQL plan (max 5 connections)
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     poolclass=QueuePool,
