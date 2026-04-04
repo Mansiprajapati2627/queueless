@@ -1,42 +1,25 @@
 from pydantic import BaseModel
-from datetime import datetime
 from typing import List, Optional
 
-# ===== Order Item Schemas =====
-class OrderItemBase(BaseModel):
+class OrderItemCreate(BaseModel):
     item_id: int
     quantity: int
     price: float
 
-class OrderItemCreate(OrderItemBase):
-    pass
-
-class OrderItemResponse(OrderItemBase):
-    order_item_id: int
-    order_id: int
-    item_name: str   # <-- added to avoid nested menu_item
-
-    class Config:
-        from_attributes = True
-
-# ===== Order Schemas =====
-class OrderBase(BaseModel):
+class OrderCreate(BaseModel):
     user_id: Optional[int] = None
     table_id: Optional[int] = None
     order_type: str
     total_amount: Optional[float] = None
-
-class OrderCreate(OrderBase):
     items: List[OrderItemCreate]
 
-class OrderUpdateStatus(BaseModel):
-    order_status: str
-
-class OrderResponse(OrderBase):
+class OrderResponse(BaseModel):
     order_id: int
+    user_id: Optional[int] = None
+    table_id: Optional[int] = None
+    order_type: str
+    total_amount: Optional[float] = None
     order_status: str
-    order_time: datetime
-    items: List[OrderItemResponse] = []
 
     class Config:
         from_attributes = True

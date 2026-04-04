@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, Enum, DECIMAL, TIMESTAMP, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.config.database import Base
-from app.models.table_model import DiningTable
 
 class Order(Base):
     __tablename__ = "orders"
@@ -10,8 +9,8 @@ class Order(Base):
     order_id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
     table_id = Column(Integer, ForeignKey("tables.table_id"))
-    order_type = Column(Enum('dine_in', 'parcel', name='order_type_enum'), nullable=False)
-    order_status = Column(Enum('pending', 'accepted', 'preparing', 'ready', 'completed', name='order_status_enum'), default='pending')
+    order_type = Column(Enum('dine_in', 'parcel'), nullable=False)
+    order_status = Column(Enum('pending', 'accepted', 'preparing', 'ready', 'completed'), default='pending')
     total_amount = Column(DECIMAL(10,2))
     order_time = Column(TIMESTAMP, server_default=func.current_timestamp())
 

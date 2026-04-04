@@ -4,15 +4,15 @@ from app.services import user_service
 from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate
 from app.utils.auth import get_db, get_current_active_user, get_current_admin_user
 from app.models.user_model import User
+from app.services import menu_service
+from app.schemas.menu_schema import MenuResponse
+from app.utils.auth import get_db
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 
-@router.post("/register", response_model=UserResponse)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = user_service.get_user_by_email(db, user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return user_service.create_user(db, user)
+@router.get("/", response_model=list[MenuResponse])
+def read_menu_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return menu_service.get_menu_items(db, skip=skip, limit=limit)
 
 @router.get("/me", response_model=UserResponse)
 def read_users_me(current_user: User = Depends(get_current_active_user)):

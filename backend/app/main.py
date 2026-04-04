@@ -7,7 +7,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="QueueLess Backend")
 
-# Allow all origins for debugging (change back after testing)
+# CORS – allow all origins for debugging; replace with your frontend URL after testing
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

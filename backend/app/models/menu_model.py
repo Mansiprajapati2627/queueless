@@ -9,7 +9,7 @@ class Menu(Base):
     item_name = Column(String(100), nullable=False)
     description = Column(Text)
     price = Column(DECIMAL(10,2), nullable=False)
-    category = Column(String(50), nullable=False)          # NEW
+    category = Column(String(50), nullable=False)
     image_url = Column(String(255))
     availability = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())

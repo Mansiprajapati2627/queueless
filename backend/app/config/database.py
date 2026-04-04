@@ -14,7 +14,7 @@ SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 if not SQLALCHEMY_DATABASE_URL:
     raise Exception("DATABASE_URL environment variable not set")
 
-# Use NullPool to avoid connection pool limits (creates a new connection per request)
+# Use NullPool to avoid connection pool limits
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     poolclass=NullPool,
