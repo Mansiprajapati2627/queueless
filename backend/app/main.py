@@ -29,3 +29,7 @@ app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 @app.get("/")
 def root():
     return {"message": "Welcome to QueueLess API"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
