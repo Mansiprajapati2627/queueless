@@ -6,6 +6,7 @@ from app.config.database import engine, Base
 from app.utils.auth import get_db, authenticate_user
 from app.models.user_model import User
 from app.utils.auth import get_password_hash
+from sqlalchemy import text
 
 Base.metadata.create_all(bind=engine)
 
@@ -70,3 +71,15 @@ def cors_test():
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
+@app.get("/run-sql")
+def run_sql(sql: str, db: Session = Depends(get_db)):
+    try:
+        result = db.execute(text(sql))
+        if sql.strip().upper().startswith("SELECT"):
+            rows = [dict(row._mapping) for row in result]
+            return {"success": True, "rows": rows}
+        else:
+            db.commit()
+            return {"success": True, "rows_affected": result.rowcount}
+    except Exception as e:
+        return {"error": str(e)}
