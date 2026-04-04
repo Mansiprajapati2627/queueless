@@ -1,13 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.services import menu_service
-from app.schemas.menu_schema import MenuCreate, MenuResponse, MenuUpdate
-from app.utils.auth import get_db, get_current_admin_user
-from app.models.user_model import User
+from app.schemas.menu_schema import MenuResponse
+from app.utils.auth import get_db
 
-router = APIRouter(redirect_slashes=False)   # CRITICAL
+router = APIRouter()
 
-@router.get("", response_model=list[MenuResponse])   # empty string, not "/"
+@router.get("/", response_model=list[MenuResponse])
 def read_menu_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return menu_service.get_menu_items(db, skip=skip, limit=limit)
 
