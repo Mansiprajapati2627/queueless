@@ -1,9 +1,7 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from app.config.database import engine, Base
-from app.utils.auth import get_db
 from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
+from app.config.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,7 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers (all with redirect_slashes=False)
+# Include routers – all have redirect_slashes=False
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
@@ -31,10 +29,3 @@ app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 @app.get("/")
 def root():
     return {"message": "Welcome to QueueLess API"}
-
-@app.post("/test-order")
-def test_order(db: Session = Depends(get_db)):
-    from app.schemas.order_schema import OrderCreate, OrderItemCreate
-    items = [OrderItemCreate(item_id=1, quantity=1, price=100.0)]
-    order = OrderCreate(user_id=1, table_id=3, order_type='dine_in', total_amount=100.0, items=items)
-    return order_service.create_order(db, order)

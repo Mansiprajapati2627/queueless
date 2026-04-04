@@ -36,7 +36,6 @@ const CartPage = () => {
 
     setPlacing(true);
     try {
-      // Create order
       const orderData = {
         user_id: user.user_id,
         table_id: tableNumber,
@@ -48,11 +47,10 @@ const CartPage = () => {
           price: item.price
         }))
       };
-      console.log('Sending order data:', orderData);
+      console.log('Sending order:', orderData);
       const orderResponse = await api.post('/orders', orderData);
       const order = orderResponse.data;
 
-      // Create payment
       await api.post('/payments', {
         order_id: order.order_id,
         payment_mode: paymentMethod,
