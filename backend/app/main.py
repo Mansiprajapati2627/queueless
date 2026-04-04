@@ -28,7 +28,7 @@ app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
 app.include_router(order_routes.router, prefix="/orders", tags=["Orders"])
 app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 
-# Temporary endpoint to insert tables 1-25 (remove after use)
+# Temporary endpoint to insert tables 1-25 – REMOVE AFTER USE
 @app.get("/init-tables")
 def init_tables(db: Session = Depends(get_db)):
     for i in range(1, 26):
