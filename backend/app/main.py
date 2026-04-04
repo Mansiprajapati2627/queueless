@@ -1,86 +1,33 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
 from app.config.database import engine, Base
-from app.utils.auth import get_db, authenticate_user
-from app.models.user_model import User
-from app.utils.auth import get_password_hash
-from sqlalchemy import text
+from app.utils.auth import get_db
+from app.routes import auth_routes, user_routes, menu_routes, order_routes, payment_routes
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="QueueLess Backend")
 
-# CORS – MUST be the first middleware
+# CORS – allow your frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://queueless-frontend-84br.onrender.com",
+        "http://localhost:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
+# Include routers (all with redirect_slashes=False – we'll set in each router)
 app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(menu_routes.router, prefix="/menu", tags=["Menu"])
 app.include_router(order_routes.router, prefix="/orders", tags=["Orders"])
 app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 
-# Temporary endpoint to rehash admin password – REMOVE AFTER USE
-@app.get("/fix-password")
-def fix_admin_password():
-    db = next(get_db())
-    admin = db.query(User).filter(User.email == "admin@queueless.com").first()
-    if not admin:
-        return {"error": "Admin user not found"}
-    admin.password = get_password_hash("admin123")
-    db.commit()
-    return {"message": "Admin password rehashed successfully"}
-
-@app.get("/debug-auth")
-def debug_auth(db: Session = Depends(get_db)):
-    try:
-        # Rehash admin password if needed
-        admin = db.query(User).filter(User.email == "admin@queueless.com").first()
-        if admin:
-            # Rehash regardless (safe to do once)
-            admin.password = get_password_hash("admin123")
-            db.commit()
-            print("Admin password rehashed")
-        users = db.query(User).limit(1).all()
-        user = authenticate_user(db, "admin@queueless.com", "admin123")
-        return {
-            "db_connection": "ok",
-            "users_count": len(users),
-            "authenticate_user_result": user is not False,
-            "user_email": user.email if user else None
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
 @app.get("/")
 def root():
     return {"message": "Welcome to QueueLess API"}
-
-@app.get("/cors-test")
-def cors_test():
-    return {"message": "CORS works"}
-
-@app.get("/ping")
-def ping():
-    return {"message": "pong"}
-
-@app.get("/run-sql")
-def run_sql(sql: str, db: Session = Depends(get_db)):
-    try:
-        result = db.execute(text(sql))
-        if sql.strip().upper().startswith("SELECT"):
-            rows = [dict(row._mapping) for row in result]
-            return {"success": True, "rows": rows}
-        else:
-            db.commit()
-            return {"success": True, "rows_affected": result.rowcount}
-    except Exception as e:
-        return {"error": str(e)}
