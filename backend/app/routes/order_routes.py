@@ -5,12 +5,19 @@ from app.schemas.order_schema import OrderCreate, OrderResponse, OrderUpdateStat
 from app.utils.auth import get_db, get_current_active_user, get_current_admin_user
 from app.models.user_model import User
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)   # CRITICAL
 
 @router.post("/", response_model=OrderResponse)
 def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
-    order.user_id = current_user.user_id
-    return order_service.create_order(db, order)
+    try:
+        order.user_id = current_user.user_id
+        print(f"Creating order for user {current_user.user_id}, table {order.table_id}, total {order.total_amount}")
+        result = order_service.create_order(db, order)
+        print(f"Order created with id {result.order_id}")
+        return result
+    except Exception as e:
+        print(f"Order creation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/", response_model=list[OrderResponse])
 def read_orders(
