@@ -17,8 +17,9 @@ const PaymentForm = ({ onPlaceOrder, total, placing }) => {
     setModalOpen(true);
   };
 
-  const handlePaymentConfirm = (method, details) => {
+  const handlePaymentConfirm = (method) => {
     onPlaceOrder(method);
+    setModalOpen(false);
   };
 
   const getIcon = (method) => {

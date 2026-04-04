@@ -62,10 +62,7 @@ const CartPage = () => {
     } catch (error) {
       console.error('Order failed:', error);
       if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Status:', error.response.status);
-        const msg = error.response.data?.detail || error.response.data?.message || 'Unknown error';
-        alert(`Order failed: ${msg}`);
+        alert(`Order failed: ${error.response.data?.detail || error.response.data?.message || 'Unknown error'}`);
       } else {
         alert('Failed to place order. Please try again.');
       }
