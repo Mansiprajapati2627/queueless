@@ -8,12 +8,7 @@ from app.models.user_model import User
 router = APIRouter(redirect_slashes=False)
 
 @router.post("/", response_model=OrderResponse)
-def create_order(
-    order: OrderCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
-):
-    # Associate order with the logged-in user
+def create_order(order: OrderCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):
     order.user_id = current_user.user_id
     return order_service.create_order(db, order)
 
