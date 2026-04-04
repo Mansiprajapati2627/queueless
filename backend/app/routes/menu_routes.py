@@ -5,9 +5,9 @@ from app.schemas.menu_schema import MenuCreate, MenuResponse, MenuUpdate
 from app.utils.auth import get_db, get_current_admin_user
 from app.models.user_model import User
 
-router = APIRouter(redirect_slashes=False)
+router = APIRouter(redirect_slashes=False)   # CRITICAL
 
-@router.get("/", response_model=list[MenuResponse])
+@router.get("", response_model=list[MenuResponse])   # empty string, not "/"
 def read_menu_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return menu_service.get_menu_items(db, skip=skip, limit=limit)
 
