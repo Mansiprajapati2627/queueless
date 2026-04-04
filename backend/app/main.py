@@ -31,10 +31,22 @@ app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 # Temporary endpoint to insert tables 1-25 – REMOVE AFTER USE
 @app.get("/init-tables")
 def init_tables(db: Session = Depends(get_db)):
-    for i in range(1, 26):
-        db.execute("INSERT IGNORE INTO tables (table_number) VALUES (:num)", {"num": i})
-    db.commit()
-    return {"message": "Tables 1-25 inserted"}
+    try:
+        # Ensure the tables table exists (should already, but safe)
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS tables (
+                table_id INT AUTO_INCREMENT PRIMARY KEY,
+                table_number INT NOT NULL UNIQUE
+            )
+        """)
+        db.commit()
+        # Insert numbers 1-25
+        for i in range(1, 26):
+            db.execute("INSERT INTO tables (table_number) VALUES (:num) ON DUPLICATE KEY UPDATE table_number = table_number", {"num": i})
+        db.commit()
+        return {"message": "Tables 1-25 inserted successfully"}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/")
 def root():
