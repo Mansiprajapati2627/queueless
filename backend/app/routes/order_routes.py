@@ -5,7 +5,7 @@ from app.schemas.order_schema import OrderCreate, OrderResponse, OrderUpdateStat
 from app.utils.auth import get_db, get_current_active_user, get_current_admin_user
 from app.models.user_model import User
 
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 
 @router.post("/", response_model=OrderResponse)
 def create_order(

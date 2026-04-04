@@ -4,8 +4,7 @@ from app.services import payment_service
 from app.schemas.payment_schema import PaymentCreate, PaymentResponse, PaymentUpdateStatus
 from app.utils.auth import get_db, get_current_admin_user, get_current_active_user
 from app.models.user_model import User
-router = APIRouter()
-
+router = APIRouter(redirect_slashes=False)
 @router.post("/", response_model=PaymentResponse)
 def create_payment(
     payment: PaymentCreate,

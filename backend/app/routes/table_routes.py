@@ -4,8 +4,8 @@ from app.services import table_service
 from app.schemas.table_schema import TableCreate, TableResponse
 from app.utils.auth import get_db, get_current_admin_user
 from app.models.user_model import User
-router = APIRouter()
 
+router = APIRouter(redirect_slashes=False)
 @router.post("/", response_model=TableResponse)
 def create_table(
     table: TableCreate,

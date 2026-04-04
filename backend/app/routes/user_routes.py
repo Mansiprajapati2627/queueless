@@ -4,7 +4,7 @@ from app.services import user_service
 from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate
 from app.utils.auth import get_db, get_current_active_user, get_current_admin_user
 from app.models.user_model import User
-router = APIRouter()
+router = APIRouter(redirect_slashes=False)
 
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
