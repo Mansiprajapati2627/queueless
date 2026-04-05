@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 import bcrypt
 import os
 from dotenv import load_dotenv
-from app.config.database import SessionLocal
+from app.config.database import SessionLocal, get_db   # import get_db from database
 from app.models.user_model import User
 from app.schemas.token_schema import TokenData
 
@@ -34,15 +34,14 @@ def authenticate_user(db: Session, email: str, password: str):
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(lambda: next(get_db()))):
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)   # use shared get_db — no duplicate sessions
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -68,10 +67,3 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return current_user
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
