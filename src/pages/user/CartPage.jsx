@@ -9,6 +9,20 @@ import { Link } from 'react-router-dom';
 import { Edit } from 'lucide-react';
 import api from '../../services/api';
 
+// FIX: Map display payment method names → DB enum values
+// DB enum is ('UPI', 'card', 'cash') — exactly these strings.
+// PaymentForm sends 'UPI', 'Card', 'Cash' from PAYMENT_METHODS constants.
+// 'Card' and 'Cash' (capital first letter) cause MySQL DataError → 500 → fake CORS error.
+const PAYMENT_METHOD_MAP = {
+  'UPI': 'UPI',
+  'Card': 'card',
+  'Cash': 'cash',
+  // lowercase fallbacks in case constants change
+  'card': 'card',
+  'cash': 'cash',
+  'upi': 'UPI',
+};
+
 const CartPage = () => {
   const { items, total, isTableSelected, tableNumber, setTableNumber, clearCart } = useCart();
   const { user } = useAuth();
@@ -48,14 +62,15 @@ const CartPage = () => {
         }))
       };
 
-      // FIX: Use trailing slash to avoid CORS-blocked 307 redirect
       const orderResponse = await api.post('/orders/', orderData);
       const order = orderResponse.data;
 
-      // FIX: Use trailing slash here too
+      // FIX: normalize payment method to match DB enum exactly
+      const normalizedMethod = PAYMENT_METHOD_MAP[paymentMethod] || paymentMethod.toLowerCase();
+
       await api.post('/payments/', {
         order_id: order.order_id,
-        payment_mode: paymentMethod,
+        payment_mode: normalizedMethod,
         amount: total
       });
 
