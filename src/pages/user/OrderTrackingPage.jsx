@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
@@ -43,27 +43,40 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const fetchOrders = useCallback(async () => {
+    try {
+      const response = await api.get('/orders/');
+      // FIX: Backend already filters by user (order_routes.py returns only the
+      // current user's orders for non-admins). No need to double-filter here.
+      // Previously: response.data.filter(order => order.user_id === user?.user_id)
+      // That was redundant AND broke if user_id types didn't match exactly.
+      setOrders(response.data);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await api.get('/orders');
-        // Filter orders for current user if needed (backend may already filter)
-        const userOrders = response.data.filter(order => order.user_id === user?.user_id);
-        setOrders(userOrders);
-      } catch (error) {
-        console.error('Failed to fetch orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (user) fetchOrders();
-    else setLoading(false);
-  }, [user]);
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    fetchOrders();
+
+    // FIX: Poll every 15s so order status updates live without a page refresh
+    const interval = setInterval(fetchOrders, 15000);
+    return () => clearInterval(interval);
+  }, [user, fetchOrders]);
 
   const currentOrders = orders.filter(o => o.order_status !== 'completed');
   const pastOrders = orders.filter(o => o.order_status === 'completed');
 
   if (loading) return <div className="loading-spinner">Loading orders...</div>;
+
+  if (!user) return <div className="tracking-page"><p>Please log in to track your orders.</p></div>;
 
   return (
     <div className="tracking-page">

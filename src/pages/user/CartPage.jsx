@@ -47,11 +47,13 @@ const CartPage = () => {
           price: item.price
         }))
       };
-      console.log('Sending order:', orderData);
-      const orderResponse = await api.post('/orders', orderData);
+
+      // FIX: Use trailing slash to avoid CORS-blocked 307 redirect
+      const orderResponse = await api.post('/orders/', orderData);
       const order = orderResponse.data;
 
-      await api.post('/payments', {
+      // FIX: Use trailing slash here too
+      await api.post('/payments/', {
         order_id: order.order_id,
         payment_mode: paymentMethod,
         amount: total
