@@ -5,6 +5,7 @@ from app.schemas.menu_schema import MenuCreate, MenuResponse, MenuUpdate
 from app.utils.auth import get_db, get_current_admin_user
 from app.models.user_model import User
 
+# CRITICAL: redirect_slashes=False prevents FastAPI from redirecting /menu to /menu/
 router = APIRouter(redirect_slashes=False)
 
 @router.get("/", response_model=list[MenuResponse])

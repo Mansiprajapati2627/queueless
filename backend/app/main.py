@@ -32,3 +32,7 @@ def root():
 @app.get("/cors-test")
 def cors_test():
     return {"message": "CORS works"}
+
+@app.get("/test-menu")
+def test_menu():
+    return {"message": "test menu works"}
