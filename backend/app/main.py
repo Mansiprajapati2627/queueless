@@ -28,3 +28,7 @@ app.include_router(payment_routes.router, prefix="/payments", tags=["Payments"])
 @app.get("/")
 def root():
     return {"message": "Welcome to QueueLess API"}
+
+@app.get("/cors-test")
+def cors_test():
+    return {"message": "CORS works"}
