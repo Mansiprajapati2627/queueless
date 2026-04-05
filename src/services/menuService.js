@@ -1,7 +1,8 @@
 import api from './api';
 
 export const fetchMenu = async () => {
-  const response = await api.get('/menu');   // no slash
+  // ✅ MUST be '/menu' – no trailing slash
+  const response = await api.get('/menu');
   return response.data;
 };
 
