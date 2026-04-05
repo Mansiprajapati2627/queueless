@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../hooks/useCart';
 import { useAuth } from '../../hooks/useAuth';
-import api from '../../services/api';
+import { fetchMenu } from '../../services/menuService';   // ✅ use the service
 import { formatCurrency } from '../../utils/helpers';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { Clock, Coffee, Award, Users, Star, TrendingUp } from 'lucide-react';
@@ -35,17 +35,15 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const response = await api.get('/menu/');
-        setMenuItems(response.data);
-      } catch (error) {
-        console.error('Failed to fetch menu:', error);
-      } finally {
+    fetchMenu()
+      .then(data => {
+        setMenuItems(data);
         setLoading(false);
-      }
-    };
-    fetchMenu();
+      })
+      .catch(err => {
+        console.error('Failed to fetch menu:', err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -55,7 +53,6 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Popular dishes – take first 6 items (you can change this logic)
   const popularItems = menuItems.slice(0, 6);
 
   if (loading) return <LoadingSpinner />;
