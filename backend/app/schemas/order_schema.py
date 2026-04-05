@@ -13,6 +13,9 @@ class OrderCreate(BaseModel):
     total_amount: Optional[float] = None
     items: List[OrderItemCreate]
 
+class OrderUpdateStatus(BaseModel):
+    order_status: str
+
 class OrderResponse(BaseModel):
     order_id: int
     user_id: Optional[int] = None
