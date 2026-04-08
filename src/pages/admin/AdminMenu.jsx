@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchMenu, createMenuItem, updateMenuItem, deleteMenuItem } from '../../services/menuService';
+import { fetchMenu, fetchAllMenu, createMenuItem, updateMenuItem, deleteMenuItem } from '../../services/menuService';
 import { formatCurrency } from '../../utils/helpers';
 import { Search, Edit, Trash2, Plus, X, Save, AlertCircle } from 'lucide-react';
 
@@ -41,7 +41,7 @@ const AdminMenu = () => {
   const loadMenu = async () => {
     setLoading(true);
     try {
-      const data = await fetchMenu();
+      const data = await fetchAllMenu();
       setMenuItems(data);
     } catch (err) {
       setError('Failed to load menu');

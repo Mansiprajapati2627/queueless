@@ -1,19 +1,24 @@
 import api from './api';
 
+// User-facing: only available items
 export const fetchMenu = async () => {
-  // ✅ MUST be '/menu' – no trailing slash
-  const response = await api.get('/menu');
+  const response = await api.get('/menu/');
+  return response.data;
+};
+
+// FIX #3: Admin-facing: ALL items including out-of-stock
+export const fetchAllMenu = async () => {
+  const response = await api.get('/menu/admin/all');
   return response.data;
 };
 
 export const fetchCategories = async () => {
   const menu = await fetchMenu();
-  const categories = [...new Set(menu.map(item => item.category))];
-  return categories;
+  return [...new Set(menu.map(item => item.category))];
 };
 
 export const createMenuItem = async (itemData) => {
-  const response = await api.post('/menu', itemData);
+  const response = await api.post('/menu/', itemData);
   return response.data;
 };
 
