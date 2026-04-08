@@ -11,11 +11,19 @@ export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState(null);
 
+  // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cartItems');
-    if (savedCart) setItems(JSON.parse(savedCart));
+    if (savedCart) {
+      try {
+        setItems(JSON.parse(savedCart));
+      } catch {
+        setItems([]);
+      }
+    }
   }, []);
 
+  // Persist cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(items));
   }, [items]);
@@ -42,10 +50,26 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // FIX #4: clearCart also wipes localStorage and resets table
   const clearCart = () => {
     setItems([]);
     setPaymentMethod(null);
+    localStorage.removeItem('cartItems');
   };
+
+  // FIX #4: When token disappears (logout), clear cart state + localStorage
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      // AuthContext.logout() removes 'token' AND 'cartItems'
+      // This handler catches that and clears in-memory cart state too
+      if (e.key === 'cartItems' && e.newValue === null) {
+        setItems([]);
+        setPaymentMethod(null);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const total = useMemo(() => {
     return items.reduce((sum, i) => sum + i.price * i.quantity, 0);

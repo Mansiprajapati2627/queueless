@@ -8,12 +8,14 @@ import { ShoppingCart } from 'lucide-react';
 
 const TopBar = () => {
   const { user, logout } = useAuth();
-  const { items } = useCart();
+  // FIX #4: get clearCart so we can wipe cart state on logout
+  const { items, clearCart } = useCart();
   const navigate = useNavigate();
   const { isLoginModalOpen, closeLoginModal, openLoginModal } = useModal();
 
   const handleLogout = () => {
-    logout();
+    clearCart();   // wipe in-memory cart immediately
+    logout();      // removes token + cartItems from localStorage
     navigate('/');
   };
 

@@ -3,7 +3,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 
-const LoginModal = ({ isOpen, onClose }) => {
+// FIX #1: Accept redirectTo prop so PrivateRoute can tell modal where to go after login
+const LoginModal = ({ isOpen, onClose, redirectTo = null }) => {
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState('login');
@@ -60,16 +61,17 @@ const LoginModal = ({ isOpen, onClose }) => {
         if (result.success) {
           const isAdmin = result.user?.role === 'admin';
           handleClose();
-          // Redirect based on role
+          // FIX #1: Admin always goes to /admin/dashboard, user goes to redirectTo or /profile
           if (isAdmin) {
-            navigate('/admin');
+            navigate('/admin/dashboard');
           } else {
-            navigate('/profile');
+            navigate(redirectTo || '/profile');
           }
         } else {
           setError(result.error || 'Login failed');
         }
       } else {
+        // FIX #2: register is now available from useAuth
         const result = await register(name, email, password, phone);
         if (result.success) {
           setSuccessMessage('Registration successful! You can now log in.');
@@ -141,7 +143,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 234 567 8900"
+                placeholder="+91 98765 43210"
                 disabled={isLoading}
               />
             </div>
@@ -164,11 +166,11 @@ const LoginModal = ({ isOpen, onClose }) => {
           </button>
         </form>
         <div className="modal-footer">
-             {mode === 'login' ? (
-              <p className="center-text">
-               Don't have an account?{' '}
-               <button onClick={toggleMode} className="modal-link">Sign up</button>
-              </p>
+          {mode === 'login' ? (
+            <p className="center-text">
+              Don't have an account?{' '}
+              <button onClick={toggleMode} className="modal-link">Sign up</button>
+            </p>
           ) : (
             <p>
               Already have an account?{' '}
@@ -176,11 +178,6 @@ const LoginModal = ({ isOpen, onClose }) => {
             </p>
           )}
         </div>
-        {mode === 'login' && (
-          <div className="modal-demo">
-          
-          </div>
-        )}
       </div>
     </div>
   );

@@ -29,15 +29,38 @@ export const AuthProvider = ({ children }) => {
       });
       localStorage.setItem('token', res.data.access_token);
       const userRes = await api.get('/users/me');
-      setUser(userRes.data);
-      return { success: true };
+      const loggedInUser = userRes.data;
+      setUser(loggedInUser);
+      // FIX #1: Return the actual user object so LoginModal can redirect correctly
+      return { success: true, user: loggedInUser };
     } catch (error) {
       return { success: false, error: error.response?.data?.detail };
     }
   };
 
+  // FIX #2: Add register function that was missing from AuthContext
+  const register = async (name, email, password, phone) => {
+    try {
+      await api.post('/users/register', {
+        name,
+        email,
+        password,
+        phone: phone || '0000000000',
+        role: 'user',
+      });
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.detail || 'Registration failed',
+      };
+    }
+  };
+
+  // FIX #4: logout clears cart from localStorage too
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('cartItems');
     setUser(null);
   };
 
@@ -45,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     login,
+    register,
     logout,
     isAdmin: user?.role === 'admin',
     isAuthenticated: !!user,
