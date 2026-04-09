@@ -9,7 +9,7 @@ const MenuItemCard = ({ item }) => {
   const { addItem, isTableSelected } = useCart();
   const { openLoginModal } = useModal();
 
-  // FIX #3: item.availability comes from the backend — false means out of stock
+  // FIX #4: availability=false means out of stock — show the card but disable add to cart
   const isAvailable = item.availability !== false;
 
   const handleAddToCart = () => {
@@ -36,13 +36,13 @@ const MenuItemCard = ({ item }) => {
   };
 
   return (
-    // FIX #3: add 'out-of-stock' class so CSS can grey the card out
+    // FIX #4: 'out-of-stock' class greys the card via CSS — item is still visible
     <div className={`menu-card${!isAvailable ? ' out-of-stock' : ''}`}>
       <div
         className="card-image"
         style={{ backgroundImage: `url(${item.image_url})`, position: 'relative' }}
       >
-        {/* FIX #3: overlay badge on the image when unavailable */}
+        {/* FIX #4: red badge overlay on image when out of stock */}
         {!isAvailable && (
           <div style={{
             position: 'absolute', inset: 0,
@@ -68,7 +68,7 @@ const MenuItemCard = ({ item }) => {
         <div className="card-footer">
           <span className="price">{formatCurrency(item.price)}</span>
 
-          {/* FIX #3: show disabled state when out of stock */}
+          {/* FIX #4: show disabled "Unavailable" button instead of hiding item */}
           {isAvailable ? (
             <button onClick={handleAddToCart}>Add to cart</button>
           ) : (
