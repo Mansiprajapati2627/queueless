@@ -6,12 +6,34 @@ import { formatCurrency } from '../../utils/helpers';
 import { Search, Filter, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 const statusOptions = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'accepted', label: 'Accepted' },
+  { value: 'pending',   label: 'Pending'   },
+  { value: 'accepted',  label: 'Accepted'  },
   { value: 'preparing', label: 'Preparing' },
-  { value: 'ready', label: 'Ready' },
+  { value: 'ready',     label: 'Ready'     },
   { value: 'completed', label: 'Completed' },
 ];
+
+/**
+ * Safely parse an order_time string from the backend.
+ * If the string has no timezone suffix (no Z, no +xx:xx) we append 'Z'
+ * so the browser treats it as UTC instead of local time, which avoids
+ * "Invalid Date" on some browsers and wrong-day bucketing.
+ */
+const parseOrderTime = (raw) => {
+  if (!raw) return null;
+  // Already has timezone info → parse as-is
+  if (/[Zz]$/.test(raw) || /[+-]\d{2}:\d{2}$/.test(raw)) {
+    return new Date(raw);
+  }
+  // Naive datetime from Python — assume UTC
+  return new Date(raw + 'Z');
+};
+
+const formatOrderTime = (raw) => {
+  const d = parseOrderTime(raw);
+  if (!d || isNaN(d.getTime())) return '—';
+  return d.toLocaleString();
+};
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -23,19 +45,15 @@ const AdminOrders = () => {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [updating, setUpdating] = useState({});
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
+  useEffect(() => { loadOrders(); }, []);
 
-  useEffect(() => {
-    filterOrders();
-  }, [searchTerm, statusFilter, dateFilter, orders]);
+  useEffect(() => { filterOrders(); }, [searchTerm, statusFilter, dateFilter, orders]); // eslint-disable-line
 
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/orders');
-      setOrders(response.data);
+      const response = await api.get('/orders/');
+      setOrders(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Failed to load orders:', error);
     } finally {
@@ -57,15 +75,24 @@ const AdminOrders = () => {
       filtered = filtered.filter(o => o.order_status === statusFilter);
     }
 
-    const now = new Date();
-    if (dateFilter === 'today') {
-      filtered = filtered.filter(o => new Date(o.order_time).toDateString() === now.toDateString());
-    } else if (dateFilter === 'week') {
-      const weekAgo = new Date(now.setDate(now.getDate() - 7));
-      filtered = filtered.filter(o => new Date(o.order_time) >= weekAgo);
-    } else if (dateFilter === 'month') {
-      const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
-      filtered = filtered.filter(o => new Date(o.order_time) >= monthAgo);
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(o => {
+        const d = parseOrderTime(o.order_time);
+        if (!d || isNaN(d.getTime())) return false;
+        if (dateFilter === 'today') {
+          return d.toLocaleDateString('en-CA') === now.toLocaleDateString('en-CA');
+        }
+        if (dateFilter === 'week') {
+          const cutoff = new Date(now); cutoff.setDate(now.getDate() - 7);
+          return d >= cutoff;
+        }
+        if (dateFilter === 'month') {
+          const cutoff = new Date(now); cutoff.setMonth(now.getMonth() - 1);
+          return d >= cutoff;
+        }
+        return true;
+      });
     }
 
     setFilteredOrders(filtered);
@@ -74,15 +101,10 @@ const AdminOrders = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     setUpdating(prev => ({ ...prev, [orderId]: true }));
     try {
-      console.log(`Updating order ${orderId} to ${newStatus}`);
       await api.patch(`/orders/${orderId}/status`, { order_status: newStatus });
-      await loadOrders(); // reload to reflect changes
+      await loadOrders();
     } catch (error) {
       console.error('Failed to update order status:', error);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Status:', error.response.status);
-      }
       alert('Failed to update order status');
     } finally {
       setUpdating(prev => ({ ...prev, [orderId]: false }));
@@ -145,7 +167,7 @@ const AdminOrders = () => {
         </div>
         <div className="summary-card">
           <span>Total Revenue</span>
-          <strong>{formatCurrency(filteredOrders.reduce((sum, o) => sum + parseFloat(o.total_amount), 0))}</strong>
+          <strong>{formatCurrency(filteredOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0))}</strong>
         </div>
         <div className="summary-card">
           <span>Pending</span>
@@ -182,7 +204,8 @@ const AdminOrders = () => {
                     <td><span className="items-count">{order.items?.length || 0} items</span></td>
                     <td className="order-total">{formatCurrency(order.total_amount)}</td>
                     <td><OrderStatusBadge status={order.order_status} /></td>
-                    <td>{new Date(order.order_time).toLocaleString()}</td>
+                    {/* FIX: use safe formatOrderTime instead of new Date().toLocaleString() */}
+                    <td>{formatOrderTime(order.order_time)}</td>
                     <td>
                       <select
                         value={order.order_status}
@@ -208,7 +231,7 @@ const AdminOrders = () => {
                             <tbody>
                               {order.items?.map((item, idx) => (
                                 <tr key={idx}>
-                                  <td>{item.menu_item?.item_name || `Item ${item.item_id}`}</td>
+                                  <td>{item.item_name || item.menu_item?.item_name || `Item ${item.item_id}`}</td>
                                   <td>{item.quantity}</td>
                                   <td>{formatCurrency(item.price)}</td>
                                   <td>{formatCurrency(item.price * item.quantity)}</td>
@@ -219,7 +242,7 @@ const AdminOrders = () => {
                           <div className="order-meta">
                             <p><strong>User:</strong> {order.user?.name || `User ID: ${order.user_id}`}</p>
                             <p><strong>Order Type:</strong> {order.order_type}</p>
-                            <p><strong>Order Time:</strong> {new Date(order.order_time).toLocaleString()}</p>
+                            <p><strong>Order Time:</strong> {formatOrderTime(order.order_time)}</p>
                           </div>
                         </div>
                       </td>

@@ -8,22 +8,31 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import { formatCurrency } from '../../utils/helpers';
 import { Calendar, Download } from 'lucide-react';
 
-const COLORS = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD'];
+const COLORS = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#1E40AF'];
+
+/**
+ * Safely parse order_time — append 'Z' if no timezone info present
+ * so the browser treats it as UTC. Without this, naive datetimes from
+ * Python/PostgreSQL cause "Invalid Date" and break all date comparisons.
+ */
+const parseDate = (raw) => {
+  if (!raw) return null;
+  if (/[Zz]$/.test(raw) || /[+-]\d{2}:\d{2}$/.test(raw)) return new Date(raw);
+  return new Date(raw + 'Z');
+};
 
 const AdminAnalytics = () => {
   const [orders, setOrders] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  // FIX #2: track fetch errors so we show a message instead of blank page
   const [fetchError, setFetchError] = useState(null);
-  const [dateRange, setDateRange] = useState('week');
+  const [dateRange, setDateRange] = useState('month');
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setFetchError(null);
       try {
-        // FIX #2: fetch independently so a menu failure doesn't kill order data
         const [ordersRes, menuRes] = await Promise.all([
           api.get('/orders/'),
           api.get('/menu/'),
@@ -55,76 +64,77 @@ const AdminAnalytics = () => {
     );
   }
 
-  // FIX #2: safe date filtering — guard against null order_time
+  // FIX: use parseDate() everywhere — never call new Date(o.order_time) directly
   const getFilteredOrders = () => {
     const now = new Date();
+    if (dateRange === 'all') return orders;
+
     const cutoff = new Date();
-    if (dateRange === 'week')  cutoff.setDate(now.getDate() - 7);
-    else if (dateRange === 'month') cutoff.setMonth(now.getMonth() - 1);
+    if (dateRange === 'week')       cutoff.setDate(now.getDate() - 7);
+    else if (dateRange === 'month') cutoff.setDate(now.getDate() - 30);
     else if (dateRange === 'year')  cutoff.setFullYear(now.getFullYear() - 1);
-    else return orders; // all time
 
     return orders.filter(o => {
-      if (!o.order_time) return false;
-      return new Date(o.order_time) >= cutoff;
+      const d = parseDate(o.order_time);
+      return d && !isNaN(d.getTime()) && d >= cutoff;
     });
   };
 
   const filteredOrders = getFilteredOrders();
 
-  // Metrics — guard against null total_amount
-  const totalOrders = filteredOrders.length;
-  const totalRevenue = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+  const totalOrders   = filteredOrders.length;
+  const totalRevenue  = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
   const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
 
   // Daily orders & revenue
   const getDailyData = () => {
-    const endDate = new Date();
+    const endDate   = new Date();
     const startDate = new Date();
-    if (dateRange === 'week')  startDate.setDate(endDate.getDate() - 6);
+    if (dateRange === 'week')       startDate.setDate(endDate.getDate() - 6);
     else if (dateRange === 'month') startDate.setDate(endDate.getDate() - 29);
     else if (dateRange === 'year')  startDate.setFullYear(endDate.getFullYear() - 1);
-    else startDate.setDate(endDate.getDate() - 29); // all time: cap 30 days
+    else                            startDate.setDate(endDate.getDate() - 29);
 
     const diffDays = Math.min(30, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
     const days = [];
     for (let i = 0; i <= diffDays; i++) {
       const d = new Date(startDate);
       d.setDate(startDate.getDate() + i);
-      days.push(d.toISOString().slice(0, 10));
+      days.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD key
     }
 
-    const ordersByDate = {};
+    const byDate = {};
     filteredOrders.forEach(o => {
-      if (!o.order_time) return;
-      const date = o.order_time.slice(0, 10);
-      ordersByDate[date] = ordersByDate[date] || { orders: 0, revenue: 0 };
-      ordersByDate[date].orders += 1;
-      ordersByDate[date].revenue += parseFloat(o.total_amount || 0);
+      const d = parseDate(o.order_time);
+      if (!d || isNaN(d.getTime())) return;
+      const key = d.toISOString().slice(0, 10);
+      byDate[key] = byDate[key] || { orders: 0, revenue: 0 };
+      byDate[key].orders  += 1;
+      byDate[key].revenue += parseFloat(o.total_amount || 0);
     });
 
     return days.map(day => ({
-      day: day.slice(5), // show MM-DD not full date
-      orders: ordersByDate[day]?.orders || 0,
-      revenue: Math.round((ordersByDate[day]?.revenue || 0) * 100) / 100,
+      day: day.slice(5), // show MM-DD
+      orders:  byDate[day]?.orders  || 0,
+      revenue: Math.round((byDate[day]?.revenue || 0) * 100) / 100,
     }));
   };
 
-  // Category sales — FIX #2: use item_name from order items, map item_id to category via menu
+  // Category sales
   const getCategorySales = () => {
     const itemCategory = {};
     menuItems.forEach(item => { itemCategory[item.item_id] = item.category; });
 
-    const categoryMap = {};
+    const catMap = {};
     filteredOrders.forEach(order => {
       if (!order.items) return;
       order.items.forEach(item => {
         const cat = itemCategory[item.item_id] || 'Other';
-        categoryMap[cat] = (categoryMap[cat] || 0) + (item.quantity * parseFloat(item.price || 0));
+        catMap[cat] = (catMap[cat] || 0) + (item.quantity * parseFloat(item.price || 0));
       });
     });
 
-    return Object.entries(categoryMap).map(([name, value]) => ({
+    return Object.entries(catMap).map(([name, value]) => ({
       name,
       value: Math.round(value * 100) / 100,
     }));
@@ -134,25 +144,25 @@ const AdminAnalytics = () => {
   const getHourlyData = () => {
     const hours = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, orders: 0 }));
     filteredOrders.forEach(order => {
-      if (!order.order_time) return;
-      const hour = new Date(order.order_time).getHours();
-      hours[hour].orders += 1;
+      const d = parseDate(order.order_time);
+      if (!d || isNaN(d.getTime())) return;
+      hours[d.getHours()].orders += 1;
     });
     return hours;
   };
 
-  // Top selling items — FIX #2: use item_name that order_service sets dynamically
+  // Top selling items
   const getTopItems = () => {
-    const itemSales = {};
+    const sales = {};
     filteredOrders.forEach(order => {
       if (!order.items) return;
       order.items.forEach(item => {
         const name = item.item_name || `Item ${item.item_id}`;
-        itemSales[name] = (itemSales[name] || 0) + (item.quantity || 0);
+        sales[name] = (sales[name] || 0) + (item.quantity || 0);
       });
     });
-    return Object.entries(itemSales)
-      .map(([name, sales]) => ({ name, sales }))
+    return Object.entries(sales)
+      .map(([name, s]) => ({ name, sales: s }))
       .sort((a, b) => b.sales - a.sales)
       .slice(0, 5);
   };
@@ -204,7 +214,7 @@ const AdminAnalytics = () => {
 
       {filteredOrders.length === 0 ? (
         <div className="no-results" style={{ padding: '3rem', background: 'white', borderRadius: '16px', marginTop: '1rem' }}>
-          No orders found for the selected period.
+          No orders found for the selected period. Try selecting "All Time".
         </div>
       ) : (
         <div className="charts-grid">
@@ -219,7 +229,7 @@ const AdminAnalytics = () => {
                 <YAxis yAxisId="right" orientation="right" stroke="#94A3B8" tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left"  dataKey="orders"  fill="#2563EB" name="Orders" radius={[4,4,0,0]} />
+                <Bar yAxisId="left"  dataKey="orders"  fill="#2563EB" name="Orders"      radius={[4,4,0,0]} />
                 <Bar yAxisId="right" dataKey="revenue" fill="#10B981" name="Revenue (₹)" radius={[4,4,0,0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -229,7 +239,7 @@ const AdminAnalytics = () => {
           <div className="chart-card">
             <h3>Sales by Category (₹)</h3>
             {categoryData.length === 0 ? (
-              <p className="no-results">No category data available</p>
+              <p className="no-results">No category data</p>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -249,14 +259,14 @@ const AdminAnalytics = () => {
             )}
           </div>
 
-          {/* Hourly Distribution */}
+          {/* Peak Hours */}
           <div className="chart-card">
             <h3>Peak Hours</h3>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={hourlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="hour" stroke="#94A3B8" tick={{ fontSize: 10 }} interval={2} />
-                <YAxis stroke="#94A3B8" tick={{ fontSize: 11 }} />
+                <YAxis stroke="#94A3B8" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <Tooltip />
                 <Line type="monotone" dataKey="orders" stroke="#2563EB" strokeWidth={2} dot={false} />
               </LineChart>

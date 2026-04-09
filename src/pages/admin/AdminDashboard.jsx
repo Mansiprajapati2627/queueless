@@ -29,6 +29,17 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
 import { formatCurrency } from '../../utils/helpers';
 
+/**
+ * Safely parse order_time — append 'Z' if no timezone info present
+ * so the browser treats it as UTC. Without this, naive datetimes from
+ * Python/PostgreSQL cause "Invalid Date" and break all date comparisons.
+ */
+const parseDate = (raw) => {
+  if (!raw) return null;
+  if (/[Zz]$/.test(raw) || /[+-]\d{2}:\d{2}$/.test(raw)) return new Date(raw);
+  return new Date(raw + 'Z');
+};
+
 // Real revenue data built from actual orders
 const buildRevenueData = (orders) => {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -41,7 +52,7 @@ const buildRevenueData = (orders) => {
 
   orders.forEach(o => {
     if (!o.order_time) return;
-    const d = new Date(o.order_time);
+    const d = parseDate(o.order_time);
     if (d < sevenDaysAgo) return;
     const label = days[d.getDay()];
     revenueByDay[label] = (revenueByDay[label] || 0) + parseFloat(o.total_amount || 0);
@@ -130,8 +141,8 @@ const AdminDashboard = () => {
   // FIX #3: Today's orders — compare date string to avoid timezone issues
   const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
   const todayOrders = orders.filter(o => {
-    if (!o.order_time) return false;
-    return new Date(o.order_time).toLocaleDateString('en-CA') === todayStr;
+    const d = parseDate(o.order_time);
+    return d && !isNaN(d.getTime()) && d.toLocaleDateString('en-CA') === todayStr;
   }).length;
 
   const pendingOrders = orders.filter(o => o.order_status === 'pending').length;
@@ -151,8 +162,11 @@ const AdminDashboard = () => {
 
   // FIX #3: Recent orders — last 5 by date, NO today-only filter
   const recentOrders = [...orders]
-    .filter(o => o.order_time)
-    .sort((a, b) => new Date(b.order_time) - new Date(a.order_time))
+    .filter(o => {
+      const d = parseDate(o.order_time);
+      return d && !isNaN(d.getTime());
+    })
+    .sort((a, b) => parseDate(b.order_time) - parseDate(a.order_time))
     .slice(0, 5);
 
   const openOrderModal = (order) => {
