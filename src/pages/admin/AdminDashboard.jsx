@@ -1,91 +1,57 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  TrendingUp, 
-  ShoppingBag, 
-  Clock, 
-  Users, 
-  Calendar,
-  ChevronRight,
-  Award,
-  Eye,
-  X
-} from 'lucide-react';
-import {
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
+import { TrendingUp, ShoppingBag, Clock, Users, Calendar, ChevronRight, Award, Eye, X } from 'lucide-react';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
 import { formatCurrency } from '../../utils/helpers';
 
-/**
- * Safely parse order_time — append 'Z' if no timezone info present
- * so the browser treats it as UTC. Without this, naive datetimes from
- * Python/PostgreSQL cause "Invalid Date" and break all date comparisons.
- */
-const parseDate = (raw) => {
-  if (!raw) return null;
-  if (/[Zz]$/.test(raw) || /[+-]\d{2}:\d{2}$/.test(raw)) return new Date(raw);
-  return new Date(raw + 'Z');
+const parseDate = (raw) => { if (!raw) return null; return new Date(raw); };
+const toLocalKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 };
 
-// Real revenue data built from actual orders
 const buildRevenueData = (orders) => {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const revenueByDay = {};
-  const ordersByDay = {};
-
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-  sevenDaysAgo.setHours(0, 0, 0, 0);
-
-  orders.forEach(o => {
-    if (!o.order_time) return;
-    const d = parseDate(o.order_time);
-    if (d < sevenDaysAgo) return;
-    const label = days[d.getDay()];
-    revenueByDay[label] = (revenueByDay[label] || 0) + parseFloat(o.total_amount || 0);
-    ordersByDay[label] = (ordersByDay[label] || 0) + 1;
-  });
-
-  // Build ordered array starting from 6 days ago → today
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const result = [];
+
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const label = days[d.getDay()];
-    result.push({
-      day: label,
-      revenue: Math.round((revenueByDay[label] || 0) * 100) / 100,
-      orders: ordersByDay[label] || 0,
-    });
+    const key = toLocalKey(d);
+    result.push({ day: dayLabels[d.getDay()], key, revenue: 0, orders: 0 });
   }
-  return result;
+
+  orders.forEach(o => {
+    const d = parseDate(o.order_time);
+    if (!d || isNaN(d.getTime())) return;
+    const key = toLocalKey(d);
+    const slot = result.find(r => r.key === key);
+    if (slot) {
+      slot.revenue += parseFloat(o.total_amount || 0);
+      slot.orders  += 1;
+    }
+  });
+
+  return result.map(({ day, revenue, orders }) => ({ day, revenue: Math.round(revenue * 100) / 100, orders }));
 };
 
-const statusData = [
-  { name: 'Pending',   value: 0, color: '#fbbf24' },
-  { name: 'Accepted',  value: 0, color: '#3b82f6' },
-  { name: 'Preparing', value: 0, color: '#f97316' },
-  { name: 'Ready',     value: 0, color: '#10b981' },
-  { name: 'Completed', value: 0, color: '#6b7280' },
+const statusConfig = [
+  { name: 'Pending',   color: '#fbbf24' },
+  { name: 'Accepted',  color: '#3b82f6' },
+  { name: 'Preparing', color: '#f97316' },
+  { name: 'Ready',     color: '#10b981' },
+  { name: 'Completed', color: '#6b7280' },
 ];
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [orders, setOrders]   = useState([]);
+  const [users, setUsers]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -98,7 +64,7 @@ const AdminDashboard = () => {
           api.get('/users/'),
         ]);
         setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : []);
-        setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
+        setUsers(Array.isArray(usersRes.data)  ? usersRes.data  : []);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
@@ -108,75 +74,46 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  // Build revenue chart from real order data
   const revenueData = useMemo(() => buildRevenueData(orders), [orders]);
 
-  // Compute top selling items from orders
   const topItems = useMemo(() => {
     const itemSales = {};
     orders.forEach(order => {
-      if (order.items && order.items.length) {
-        order.items.forEach(item => {
-          const name = item.item_name || `Item ${item.item_id}`;
-          itemSales[name] = (itemSales[name] || 0) + item.quantity;
-        });
-      }
+      order.items?.forEach(item => {
+        const name = item.item_name || `Item ${item.item_id}`;
+        itemSales[name] = (itemSales[name] || 0) + item.quantity;
+      });
     });
     const sorted = Object.entries(itemSales)
       .map(([name, sales]) => ({ name, sales }))
-      .sort((a, b) => b.sales - a.sales)
-      .slice(0, 5);
-    const maxSales = sorted.length ? sorted[0].sales : 1;
-    return sorted.map(item => ({
-      ...item,
-      percentage: (item.sales / maxSales) * 100
-    }));
+      .sort((a, b) => b.sales - a.sales).slice(0, 5);
+    const max = sorted.length ? sorted[0].sales : 1;
+    return sorted.map(item => ({ ...item, percentage: (item.sales / max) * 100 }));
   }, [orders]);
 
   if (loading) return <LoadingSpinner />;
 
-  // Metrics
-  const totalRevenue = orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
-
-  // FIX #3: Today's orders — compare date string to avoid timezone issues
-  const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
-  const todayOrders = orders.filter(o => {
-    const d = parseDate(o.order_time);
-    return d && !isNaN(d.getTime()) && d.toLocaleDateString('en-CA') === todayStr;
-  }).length;
-
-  const pendingOrders = orders.filter(o => o.order_status === 'pending').length;
+  const totalRevenue   = orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+  const todayKey       = toLocalKey(new Date());
+  const todayOrders    = orders.filter(o => { const d = parseDate(o.order_time); return d && !isNaN(d.getTime()) && toLocalKey(d) === todayKey; }).length;
+  const pendingOrders  = orders.filter(o => o.order_status === 'pending').length;
   const totalCustomers = users.filter(u => u.role !== 'admin').length;
 
-  // Status distribution
-  const statusCounts = orders.reduce((acc, o) => {
-    acc[o.order_status] = (acc[o.order_status] || 0) + 1;
-    return acc;
-  }, {});
-  const pieData = statusData
-    .map(item => ({
-      ...item,
-      value: statusCounts[item.name.toLowerCase()] || 0
-    }))
-    .filter(item => item.value > 0);
+  const statusCounts = orders.reduce((acc, o) => { acc[o.order_status] = (acc[o.order_status] || 0) + 1; return acc; }, {});
+  const pieData = statusConfig
+    .map(s => ({ ...s, value: statusCounts[s.name.toLowerCase()] || 0 }))
+    .filter(s => s.value > 0);
 
-  // FIX #3: Recent orders — last 5 by date, NO today-only filter
+  // Recent orders — last 5 by date, no today-only restriction
   const recentOrders = [...orders]
-    .filter(o => {
-      const d = parseDate(o.order_time);
-      return d && !isNaN(d.getTime());
-    })
+    .filter(o => { const d = parseDate(o.order_time); return d && !isNaN(d.getTime()); })
     .sort((a, b) => parseDate(b.order_time) - parseDate(a.order_time))
     .slice(0, 5);
 
-  const openOrderModal = (order) => {
-    setSelectedOrder(order);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setSelectedOrder(null);
+  const formatOrderTime = (raw) => {
+    const d = parseDate(raw);
+    if (!d || isNaN(d.getTime())) return '—';
+    return d.toLocaleString();
   };
 
   return (
@@ -197,7 +134,6 @@ const AdminDashboard = () => {
           <div className="metric-icon"><TrendingUp size={24} /></div>
           <div className="metric-content">
             <h3>Total Revenue</h3>
-            {/* FIX #2: use formatCurrency instead of hardcoded $ */}
             <p className="metric-value">{formatCurrency(totalRevenue)}</p>
             <span className="metric-trend">All time</span>
           </div>
@@ -236,7 +172,6 @@ const AdminDashboard = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="day" stroke="#6B7280" />
               <YAxis stroke="#6B7280" />
-              {/* FIX #2: use ₹ symbol in tooltip */}
               <Tooltip formatter={(value) => [formatCurrency(value), 'Revenue']} />
               <Legend />
               <Line type="monotone" dataKey="revenue" stroke="#2563EB" strokeWidth={2} dot={{ fill: '#2563EB' }} />
@@ -249,16 +184,11 @@ const AdminDashboard = () => {
             <PieChart>
               <Pie
                 data={pieData.length ? pieData : [{ name: 'No data', value: 1, color: '#e5e7eb' }]}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
+                cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
-                {(pieData.length ? pieData : [{ name: 'No data', value: 1, color: '#e5e7eb' }]).map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                {(pieData.length ? pieData : [{ name: 'No data', value: 1, color: '#e5e7eb' }]).map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip />
@@ -278,14 +208,7 @@ const AdminDashboard = () => {
           <div className="recent-orders-table-wrapper">
             <table className="recent-orders-table">
               <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Table</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
+                <tr><th>Order ID</th><th>Table</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr>
               </thead>
               <tbody>
                 {recentOrders.length > 0 ? recentOrders.map(order => (
@@ -296,7 +219,7 @@ const AdminDashboard = () => {
                     <td>{formatCurrency(order.total_amount)}</td>
                     <td><OrderStatusBadge status={order.order_status} /></td>
                     <td>
-                      <button className="view-order-btn" onClick={() => openOrderModal(order)}>
+                      <button className="view-order-btn" onClick={() => { setSelectedOrder(order); setModalOpen(true); }}>
                         <Eye size={16} />
                       </button>
                     </td>
@@ -315,20 +238,18 @@ const AdminDashboard = () => {
             <Award size={20} className="header-icon" />
           </div>
           <div className="top-items-list">
-            {topItems.length > 0 ? (
-              topItems.map((item, idx) => (
-                <div key={idx} className="top-item">
-                  <div className="item-info">
-                    <span className="item-rank">{idx + 1}</span>
-                    <span className="item-name">{item.name}</span>
-                    <span className="item-sales">{item.sales} sold</span>
-                  </div>
-                  <div className="progress-bar-container">
-                    <div className="progress-bar" style={{ width: `${item.percentage}%` }}></div>
-                  </div>
+            {topItems.length > 0 ? topItems.map((item, idx) => (
+              <div key={idx} className="top-item">
+                <div className="item-info">
+                  <span className="item-rank">{idx + 1}</span>
+                  <span className="item-name">{item.name}</span>
+                  <span className="item-sales">{item.sales} sold</span>
                 </div>
-              ))
-            ) : (
+                <div className="progress-bar-container">
+                  <div className="progress-bar" style={{ width: `${item.percentage}%` }}></div>
+                </div>
+              </div>
+            )) : (
               <div className="no-results">No orders yet</div>
             )}
           </div>
@@ -342,13 +263,10 @@ const AdminDashboard = () => {
         <button className="quick-action-btn" onClick={() => navigate('/admin/analytics')}>Analytics Report</button>
       </div>
 
-      {/* Order Details Modal */}
       {modalOpen && selectedOrder && (
-        <div className="modal-overlay" onClick={closeModal}>
+        <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal-content order-details-modal" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeModal}>
-              <X size={20} />
-            </button>
+            <button className="modal-close" onClick={() => setModalOpen(false)}><X size={20} /></button>
             <div className="modal-header">
               <h2>Order Details</h2>
               <p>Order #{selectedOrder.order_id}</p>
@@ -359,13 +277,11 @@ const AdminDashboard = () => {
                 <div className="summary-row"><span>Status:</span><OrderStatusBadge status={selectedOrder.order_status} /></div>
                 <div className="summary-row"><span>Total:</span><strong>{formatCurrency(selectedOrder.total_amount)}</strong></div>
                 <div className="summary-row"><span>Order Type:</span><span>{selectedOrder.order_type}</span></div>
-                <div className="summary-row"><span>Order Time:</span><span>{new Date(selectedOrder.order_time).toLocaleString()}</span></div>
+                <div className="summary-row"><span>Order Time:</span><span>{formatOrderTime(selectedOrder.order_time)}</span></div>
               </div>
               <h3>Items</h3>
               <table className="order-items-table">
-                <thead>
-                  <tr><th>Item</th><th>Quantity</th><th>Price</th><th>Subtotal</th></tr>
-                </thead>
+                <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
                 <tbody>
                   {selectedOrder.items?.map((item, idx) => (
                     <tr key={idx}>
@@ -377,11 +293,6 @@ const AdminDashboard = () => {
                   ))}
                 </tbody>
               </table>
-              {selectedOrder.user && (
-                <div className="order-meta">
-                  <p><strong>Customer:</strong> {selectedOrder.user.name} ({selectedOrder.user.email})</p>
-                </div>
-              )}
             </div>
           </div>
         </div>

@@ -10,15 +10,20 @@ import { Calendar, Download } from 'lucide-react';
 
 const COLORS = ['#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#1E40AF'];
 
-/**
- * Safely parse order_time — append 'Z' if no timezone info present
- * so the browser treats it as UTC. Without this, naive datetimes from
- * Python/PostgreSQL cause "Invalid Date" and break all date comparisons.
- */
+// Parse order_time — naive datetimes from Python are in local/server time.
+// new Date(raw) treats no-timezone strings as LOCAL time in modern browsers,
+// which is what we want so date bucketing matches the server timezone.
 const parseDate = (raw) => {
   if (!raw) return null;
-  if (/[Zz]$/.test(raw) || /[+-]\d{2}:\d{2}$/.test(raw)) return new Date(raw);
-  return new Date(raw + 'Z');
+  return new Date(raw);
+};
+
+// Get YYYY-MM-DD in LOCAL time (NOT .toISOString() which gives UTC date).
+const toLocalKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 };
 
 const AdminAnalytics = () => {
@@ -26,7 +31,7 @@ const AdminAnalytics = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
-  const [dateRange, setDateRange] = useState('month');
+  const [dateRange, setDateRange] = useState('all');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,15 +69,21 @@ const AdminAnalytics = () => {
     );
   }
 
-  // FIX: use parseDate() everywhere — never call new Date(o.order_time) directly
   const getFilteredOrders = () => {
-    const now = new Date();
     if (dateRange === 'all') return orders;
 
-    const cutoff = new Date();
-    if (dateRange === 'week')       cutoff.setDate(now.getDate() - 7);
-    else if (dateRange === 'month') cutoff.setDate(now.getDate() - 30);
-    else if (dateRange === 'year')  cutoff.setFullYear(now.getFullYear() - 1);
+    // Build cutoff with constructor args — avoids JS Date mutation bugs
+    const now = new Date();
+    let cutoff;
+    if (dateRange === 'week') {
+      cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+    } else if (dateRange === 'month') {
+      cutoff = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    } else if (dateRange === 'year') {
+      cutoff = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    } else {
+      return orders;
+    }
 
     return orders.filter(o => {
       const d = parseDate(o.order_time);
@@ -86,45 +97,59 @@ const AdminAnalytics = () => {
   const totalRevenue  = filteredOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
   const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
 
-  // Daily orders & revenue
   const getDailyData = () => {
-    const endDate   = new Date();
-    const startDate = new Date();
-    if (dateRange === 'week')       startDate.setDate(endDate.getDate() - 6);
-    else if (dateRange === 'month') startDate.setDate(endDate.getDate() - 29);
-    else if (dateRange === 'year')  startDate.setFullYear(endDate.getFullYear() - 1);
-    else                            startDate.setDate(endDate.getDate() - 29);
+    const today = new Date();
+    let startDate;
 
-    const diffDays = Math.min(30, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
-    const days = [];
-    for (let i = 0; i <= diffDays; i++) {
-      const d = new Date(startDate);
-      d.setDate(startDate.getDate() + i);
-      days.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD key
+    if (dateRange === 'week') {
+      startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+    } else if (dateRange === 'month') {
+      startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    } else if (dateRange === 'year') {
+      startDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+    } else {
+      // All time: use earliest order date
+      const timestamps = orders
+        .map(o => parseDate(o.order_time))
+        .filter(d => d && !isNaN(d.getTime()))
+        .map(d => d.getTime());
+      if (timestamps.length) {
+        const earliest = new Date(Math.min(...timestamps));
+        startDate = new Date(earliest.getFullYear(), earliest.getMonth(), earliest.getDate());
+      } else {
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29);
+      }
     }
 
+    // Cap at 60 data points for readability
+    const diffDays = Math.min(60, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
+    const days = [];
+    for (let i = 0; i <= diffDays; i++) {
+      const d = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + i);
+      days.push(toLocalKey(d));
+    }
+
+    // Bucket by LOCAL date key
     const byDate = {};
     filteredOrders.forEach(o => {
       const d = parseDate(o.order_time);
       if (!d || isNaN(d.getTime())) return;
-      const key = d.toISOString().slice(0, 10);
+      const key = toLocalKey(d);
       byDate[key] = byDate[key] || { orders: 0, revenue: 0 };
       byDate[key].orders  += 1;
       byDate[key].revenue += parseFloat(o.total_amount || 0);
     });
 
     return days.map(day => ({
-      day: day.slice(5), // show MM-DD
+      day: day.slice(5),
       orders:  byDate[day]?.orders  || 0,
       revenue: Math.round((byDate[day]?.revenue || 0) * 100) / 100,
     }));
   };
 
-  // Category sales
   const getCategorySales = () => {
     const itemCategory = {};
     menuItems.forEach(item => { itemCategory[item.item_id] = item.category; });
-
     const catMap = {};
     filteredOrders.forEach(order => {
       if (!order.items) return;
@@ -133,14 +158,11 @@ const AdminAnalytics = () => {
         catMap[cat] = (catMap[cat] || 0) + (item.quantity * parseFloat(item.price || 0));
       });
     });
-
     return Object.entries(catMap).map(([name, value]) => ({
-      name,
-      value: Math.round(value * 100) / 100,
+      name, value: Math.round(value * 100) / 100,
     }));
   };
 
-  // Hourly distribution
   const getHourlyData = () => {
     const hours = Array.from({ length: 24 }, (_, i) => ({ hour: `${i}:00`, orders: 0 }));
     filteredOrders.forEach(order => {
@@ -151,7 +173,6 @@ const AdminAnalytics = () => {
     return hours;
   };
 
-  // Top selling items
   const getTopItems = () => {
     const sales = {};
     filteredOrders.forEach(order => {
@@ -192,7 +213,6 @@ const AdminAnalytics = () => {
         </div>
       </div>
 
-      {/* Key Metrics */}
       <div className="analytics-metrics">
         <div className="metric-card">
           <span className="metric-label">Total Orders</span>
@@ -218,14 +238,14 @@ const AdminAnalytics = () => {
         </div>
       ) : (
         <div className="charts-grid">
-          {/* Daily Orders & Revenue */}
           <div className="chart-card full-width">
             <h3>Daily Orders &amp; Revenue</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={dailyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-                <XAxis dataKey="day" stroke="#94A3B8" tick={{ fontSize: 11 }} />
-                <YAxis yAxisId="left"  orientation="left"  stroke="#94A3B8" tick={{ fontSize: 11 }} />
+                <XAxis dataKey="day" stroke="#94A3B8" tick={{ fontSize: 11 }}
+                  interval={Math.max(0, Math.floor(dailyData.length / 12) - 1)} />
+                <YAxis yAxisId="left"  orientation="left"  stroke="#94A3B8" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <YAxis yAxisId="right" orientation="right" stroke="#94A3B8" tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Legend />
@@ -235,7 +255,6 @@ const AdminAnalytics = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Category Sales */}
           <div className="chart-card">
             <h3>Sales by Category (₹)</h3>
             {categoryData.length === 0 ? (
@@ -243,12 +262,8 @@ const AdminAnalytics = () => {
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%" cy="50%"
-                    outerRadius={80} dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
+                  <Pie data={categoryData} cx="50%" cy="50%" outerRadius={80} dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                     {categoryData.map((_, index) => (
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -259,7 +274,6 @@ const AdminAnalytics = () => {
             )}
           </div>
 
-          {/* Peak Hours */}
           <div className="chart-card">
             <h3>Peak Hours</h3>
             <ResponsiveContainer width="100%" height={250}>
@@ -273,13 +287,10 @@ const AdminAnalytics = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Top Selling Items */}
           <div className="chart-card">
             <h3>Top Selling Items</h3>
             <table className="top-items-table">
-              <thead>
-                <tr><th>Item</th><th>Qty Sold</th></tr>
-              </thead>
+              <thead><tr><th>Item</th><th>Qty Sold</th></tr></thead>
               <tbody>
                 {topItems.length > 0 ? topItems.map((item, idx) => (
                   <tr key={idx}>
