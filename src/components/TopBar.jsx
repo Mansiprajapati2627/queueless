@@ -28,7 +28,7 @@ const TopBar = () => {
           <Link to="/" className="logo">
             <img
               src="/logo.png"
-              alt="QueueLess"
+              
               style={{
                 height: '42px',
                 width: 'auto',
