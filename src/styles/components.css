@@ -1475,3 +1475,45 @@
   .method-name { font-size: 0.73rem; }
   .table-grid { grid-template-columns: repeat(4, 1fr); }
 }
+/* ===== UPI mode switch ===== */
+.upi-mode-switch {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.upi-mode-switch button {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.upi-mode-switch button.active {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+/* ===== Manual UPI ===== */
+.manual-upi {
+  margin-top: 1rem;
+}
+.manual-upi .qr-code {
+  text-align: center;
+  margin: 1rem 0;
+}
+.manual-upi .qr-code img {
+  width: 150px;
+  height: 150px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  background: white;
+}
+.manual-upi .qr-code p {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}

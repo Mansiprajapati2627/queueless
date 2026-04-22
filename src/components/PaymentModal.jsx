@@ -7,6 +7,8 @@ const PaymentModal = ({ isOpen, onClose, onConfirm, total, paymentMethod }) => {
   const [cardNumber, setCardNumber] = useState('');
   const [selectedUpiApp, setSelectedUpiApp] = useState(null);
   const [cardType, setCardType] = useState('');
+  const [upiMode, setUpiMode] = useState('apps'); // 'apps' or 'manual'
+  const [manualUpiId, setManualUpiId] = useState('');
 
   const upiApps = [
     { id: 'gpay', name: 'Google Pay', icon: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg' },
@@ -38,6 +40,19 @@ const PaymentModal = ({ isOpen, onClose, onConfirm, total, paymentMethod }) => {
     setTimeout(() => {
       setLoading(false);
       onConfirm('UPI', { app: app.name, transactionId: 'UPI' + Date.now() });
+      onClose();
+    }, 1500);
+  };
+
+  const handleManualUpiPay = () => {
+    if (!manualUpiId) {
+      alert('Please enter your UPI ID');
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      onConfirm('UPI', { upiId: manualUpiId, transactionId: 'UPI' + Date.now() });
       onClose();
     }, 1500);
   };
@@ -77,24 +92,80 @@ const PaymentModal = ({ isOpen, onClose, onConfirm, total, paymentMethod }) => {
         <div className="modal-body">
           {paymentMethod === 'UPI' && (
             <div className="upi-options">
-              <p className="payment-instruction">Choose your UPI app to pay:</p>
-              <div className="upi-apps-grid">
-                {upiApps.map(app => (
-                  <button
-                    key={app.id}
-                    className="upi-app-btn"
-                    onClick={() => handleUpiPay(app)}
-                    disabled={loading}
-                  >
-                    <img src={app.icon} alt={app.name} className="app-icon" />
-                    <span>{app.name}</span>
-                  </button>
-                ))}
+              <div className="upi-mode-switch">
+                <button
+                  onClick={() => setUpiMode('apps')}
+                  className={upiMode === 'apps' ? 'active' : ''}
+                >
+                  Quick Apps
+                </button>
+                <button
+                  onClick={() => setUpiMode('manual')}
+                  className={upiMode === 'manual' ? 'active' : ''}
+                >
+                  Manual UPI
+                </button>
               </div>
-              {selectedUpiApp && loading && (
-                <div className="payment-loading">
-                  <div className="spinner"></div>
-                  <p>Processing payment via {selectedUpiApp.name}...</p>
+
+              {upiMode === 'apps' && (
+                <>
+                  <p className="payment-instruction">Choose your UPI app to pay:</p>
+                  <div className="upi-apps-grid">
+                    {upiApps.map(app => (
+                      <button
+                        key={app.id}
+                        className="upi-app-btn"
+                        onClick={() => handleUpiPay(app)}
+                        disabled={loading}
+                      >
+                        <img src={app.icon} alt={app.name} className="app-icon" />
+                        <span>{app.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {selectedUpiApp && loading && (
+                    <div className="payment-loading">
+                      <div className="spinner"></div>
+                      <p>Processing payment via {selectedUpiApp.name}...</p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {upiMode === 'manual' && (
+                <div className="manual-upi">
+                  <div className="form-group">
+                    <label>Your UPI ID (e.g., yourname@okhdfcbank)</label>
+                    <input
+                      type="text"
+                      value={manualUpiId}
+                      onChange={(e) => setManualUpiId(e.target.value)}
+                      placeholder="Enter UPI ID"
+                      disabled={loading}
+                    />
+                  </div>
+                  {manualUpiId && (
+                    <div className="qr-code">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${encodeURIComponent(manualUpiId)}&pn=QueueLess&am=${total}&cu=INR`}
+                        alt="UPI QR Code"
+                      />
+                      <p>Scan with any UPI app</p>
+                    </div>
+                  )}
+                  {loading && (
+                    <div className="payment-loading">
+                      <div className="spinner"></div>
+                      <p>Processing manual UPI payment...</p>
+                    </div>
+                  )}
+                  <button
+                    className="pay-now-btn"
+                    onClick={handleManualUpiPay}
+                    disabled={!manualUpiId || loading}
+                  >
+                    Pay ₹{total.toFixed(2)} via UPI
+                  </button>
                 </div>
               )}
             </div>
