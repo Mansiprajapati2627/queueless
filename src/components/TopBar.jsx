@@ -8,14 +8,13 @@ import { ShoppingCart } from 'lucide-react';
 
 const TopBar = () => {
   const { user, logout } = useAuth();
-  // FIX #4: get clearCart so we can wipe cart state on logout
   const { items, clearCart } = useCart();
   const navigate = useNavigate();
   const { isLoginModalOpen, closeLoginModal, openLoginModal } = useModal();
 
   const handleLogout = () => {
-    clearCart();   // wipe in-memory cart immediately
-    logout();      // removes token + cartItems from localStorage
+    clearCart();
+    logout();
     navigate('/');
   };
 
@@ -25,25 +24,47 @@ const TopBar = () => {
     <>
       <header className="top-bar">
         <div className="container">
-          <Link to="/" className="logo">QueueLess</Link>
+          {/* SVG logo — recoloured white to match blue theme */}
+          <Link to="/" className="logo">
+            <img
+              src="/logo.png"
+              alt="QueueLess"
+              style={{
+                height: '42px',
+                width: 'auto',
+                display: 'block',
+                /* invert makes dark-grey logo white on the dark topbar */
+                filter: 'brightness(0) invert(1)',
+              }}
+            />
+          </Link>
+
           <div className="top-bar-actions">
             <Link to="/cart" className="cart-icon">
               <ShoppingCart size={20} />
-              {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
+              {cartItemsCount > 0 && (
+                <span className="cart-badge">{cartItemsCount}</span>
+              )}
             </Link>
+
             <div className="user-section">
               {user ? (
                 <div className="user-info">
                   <span className="user-email">{user.email}</span>
-                  <button onClick={handleLogout} className="logout-btn">Logout</button>
+                  <button onClick={handleLogout} className="logout-btn">
+                    Logout
+                  </button>
                 </div>
               ) : (
-                <button onClick={openLoginModal} className="login-btn">Login</button>
+                <button onClick={openLoginModal} className="login-btn">
+                  Login
+                </button>
               )}
             </div>
           </div>
         </div>
       </header>
+
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </>
   );
