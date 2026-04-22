@@ -27,8 +27,8 @@ const TopBar = () => {
           {/* SVG logo — recoloured white to match blue theme */}
           <Link to="/" className="logo">
             <img
-              src="public/assets/logo.png"
-              
+              src="/logo.svg"
+              alt="QueueLess"
               style={{
                 height: '42px',
                 width: 'auto',
