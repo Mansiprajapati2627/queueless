@@ -27,7 +27,7 @@ const TopBar = () => {
           {/* SVG logo — recoloured white to match blue theme */}
           <Link to="/" className="logo">
             <img
-              src="/logo.png"
+              src="public/assets/logo.png"
               
               style={{
                 height: '42px',
