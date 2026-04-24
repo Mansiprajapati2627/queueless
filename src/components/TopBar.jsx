@@ -22,48 +22,19 @@ const TopBar = () => {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700&family=DM+Sans:wght@400;500&display=swap');
-
-        .wordmark {
-          font-family: 'Sora', sans-serif;
-          font-weight: 700;
-          font-size: 1.35rem;
-          letter-spacing: -0.5px;
-          color: #fff;
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          gap: 0px;
-          line-height: 1;
-        }
-
-        .wordmark-queue {
-          color: #fff;
-        }
-
-        .wordmark-less {
-          color: rgba(255, 255, 255, 0.55);
-          font-weight: 700;
-        }
-
-        .wordmark-dot {
-          display: inline-block;
-          width: 6px;
-          height: 6px;
-          background: #60a5fa;
-          border-radius: 50%;
-          margin: 0 1px 2px 1px;
-          flex-shrink: 0;
-        }
-      `}</style>
-
       <header className="top-bar">
         <div className="container">
-          <Link to="/" className="wordmark">
-            <span className="wordmark-queue">Queue</span>
-            <span className="wordmark-dot" />
-            <span className="wordmark-less">Less</span>
+          {/* Logo image instead of plain text */}
+          <Link to="/" className="logo">
+            <img
+              src="/logo.svg"
+              alt="QueueLess"
+              style={{
+                height: '36px',
+                width: 'auto',
+                display: 'block',
+              }}
+            />
           </Link>
 
           <div className="top-bar-actions">
