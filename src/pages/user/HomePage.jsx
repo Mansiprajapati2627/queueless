@@ -160,23 +160,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="testimonials-section">
-        <h2>What Our Customers Say</h2>
-        <div className="testimonials-grid">
-          {testimonials.map(t => (
-            <div key={t.id} className="testimonial-card">
-              <div className="stars">
-                {[...Array(t.rating)].map((_, i) => (
-                  <Star key={i} size={16} fill="#FBBF24" color="#FBBF24" />
-                ))}
-              </div>
-              <p className="comment">"{t.comment}"</p>
-              <p className="customer-name">- {t.name}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+
 
       {/* Opening Hours */}
       <section className="hours-section">
